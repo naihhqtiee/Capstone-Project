@@ -48,16 +48,7 @@ class StaffController extends BaseController
         return view('staff/dashboard', $data);
     }
 
-    public function anonymous()
-    {
-        $model = new ComplaintModel();
 
-        $data['complaints'] = $model->where('is_anonymous', 1)
-            ->orderBy('created_at', 'DESC')
-            ->findAll();
-
-        return view('staff/anonymous', $data);
-    }
 
 public function complaints()
 {
@@ -225,4 +216,91 @@ public function complaints()
 
         return redirect()->to('/staff/events')->with('success', 'Event updated successfully!');
     }
+public function uploadNda()
+{
+    $file = $this->request->getFile('nda_file');
+
+    if ($file && $file->isValid() && !$file->hasMoved()) {
+        $newName = $file->getRandomName();
+
+        // ✅ Save into public/uploads/nda so it's accessible via URL
+        $file->move(FCPATH . 'uploads/nda', $newName);
+
+        // Save record in database
+        $ndaModel = new \App\Models\NdaModel();
+        $ndaModel->insert([
+            'account_id'  => session('account_id'), // logged-in staff account
+            'file_path'   => 'uploads/nda/' . $newName, // relative to public/
+            'uploaded_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'NDA uploaded successfully!',
+            'file'    => $newName,
+            'url'     => base_url('uploads/nda/' . $newName) // ✅ return URL
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'success' => false,
+        'message' => 'Failed to upload NDA.'
+    ]);
+}
+public function ndaManagement()
+{
+    $ndaModel = new NdaModel();
+
+    // ✅ Fetch the latest NDA file (last uploaded one)
+    $ndaFile = $ndaModel->orderBy('uploaded_at', 'DESC')->first();
+
+    return view('staff/nda_management', [
+        'ndaFile' => $ndaFile
+    ]);
+}
+
+public function viewNda()
+{
+    $ndaModel = new NdaModel();
+    $ndaFile = $ndaModel->orderBy('uploaded_at', 'DESC')->first();
+
+    if (!$ndaFile || !file_exists(FCPATH . $ndaFile['file_path'])) {
+        return redirect()->back()->with('error', 'NDA file not found.');
+    }
+
+    return $this->response->download(FCPATH . $ndaFile['file_path'], null)->setFileName('nda.pdf');
+}
+
+public function downloadNda()
+{
+    $ndaModel = new NdaModel();
+    $ndaFile = $ndaModel->orderBy('uploaded_at', 'DESC')->first();
+
+    if (!$ndaFile || !file_exists(FCPATH . $ndaFile['file_path'])) {
+        return redirect()->back()->with('error', 'NDA file not found.');
+    }
+
+    return $this->response->download(FCPATH . $ndaFile['file_path'], null);
+}
+
+public function deleteNda($id)
+{
+    $ndaModel = new NdaModel();
+    $ndaFile = $ndaModel->find($id);
+
+    if ($ndaFile) {
+        // Delete physical file
+        if (file_exists(FCPATH . $ndaFile['file_path'])) {
+            unlink(FCPATH . $ndaFile['file_path']);
+        }
+
+        // Delete DB record
+        $ndaModel->delete($id);
+        return redirect()->back()->with('success', 'NDA deleted successfully.');
+    }
+
+    return redirect()->back()->with('error', 'NDA not found.');
+}
+
+
 }

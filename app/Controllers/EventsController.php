@@ -56,6 +56,59 @@ class EventsController extends BaseController
     session()->setFlashdata('success', 'Event has been successfully added!');
     return redirect()->to('staff/events');
 }
+  public function view($id)
+    {
+        $eventModel = new EventModel();
+        $event = $eventModel->find($id);
 
+        return $this->response->setJSON($event);
+    }
 
+    public function edit($id)
+    {
+        $eventModel = new EventModel();
+        $event = $eventModel->find($id);
+
+        if (!$event) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Event not found");
+        }
+
+        return view('admin/events/edit', ['event' => $event]);
+    }
+
+public function update()
+{
+    $eventModel = new \App\Models\EventModel();
+
+    $id = $this->request->getPost('id');
+    if (!$id) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Missing event ID.']);
+    }
+
+    $data = [
+        'event_name'   => $this->request->getPost('event_name'),
+        'description'  => $this->request->getPost('description'),
+        'location'     => $this->request->getPost('location'),
+        'start_date'   => $this->request->getPost('start_date'),
+        'end_date'     => $this->request->getPost('end_date'),
+        'audience'     => $this->request->getPost('audience'),
+        'updated_at'   => date('Y-m-d H:i:s')
+    ];
+
+    if ($eventModel->update($id, $data)) {
+        return $this->response->setJSON(['success' => true, 'message' => 'Event updated successfully!']);
+    } else {
+        return $this->response->setJSON(['success' => false, 'message' => 'Failed to update event.']);
+    }
 }
+
+    public function delete($id)
+    {
+        $eventModel = new EventModel();
+        $eventModel->delete($id);
+
+        return $this->response->setJSON(['success' => true, 'message' => 'Event deleted successfully']);
+    }
+}
+
+

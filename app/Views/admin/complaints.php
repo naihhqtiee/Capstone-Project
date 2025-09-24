@@ -1051,7 +1051,7 @@
         <a href="<?= base_url('admin/complaints/view/'.$complaint['id']) ?>" class="action-btn view">
             <i class='bx bx-show'></i>
         </a>
-        <a href="<?= base_url('admin/complaints/edit/'.$complaint['id']) ?>" class="action-btn edit">
+        <a href="<?= base_url('admin/complaints/edit/ '.$complaint['id']) ?>" class="action-btn edit">
             <i class='bx bx-edit'></i>
         </a>
         <a href="<?= base_url('admin/complaints/delete/'.$complaint['id']) ?>" class="action-btn delete" onclick="return confirm('Are you sure you want to delete this complaint?')">

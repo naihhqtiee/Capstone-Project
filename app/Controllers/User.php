@@ -7,6 +7,8 @@ use App\Models\EventModel;
 use App\Models\AccountModel;
 use App\Models\ComplaintModel;
 use App\Models\EventRegistrationModel;
+use App\Models\StudentModel;
+use App\Models\NdaModel;
 
 class User extends BaseController
 {
@@ -35,44 +37,53 @@ public function userdashboard()
 
     return view('user/userdashboard', $data);
 }
+public function saveIdentified()
+{
+    $complaintModel = new ComplaintModel();
+    
+    // Check if filing with identity or anonymously
+    $fileWithIdentity = $this->request->getPost('file_with_identity');
+    
+    $uploadedFileNames = $this->handleFileUploads();
 
+    $resolutions = $this->request->getPost('resolution');
+    $resolutionString = is_array($resolutions) ? implode(',', $resolutions) : $resolutions;
 
-    public function saveIdentified()
-    {
-        $complaintModel = new ComplaintModel();
+    $data = [
+        'date'              => $this->request->getPost('date'),
+        'time'              => $this->request->getPost('time'),
+        'location'          => $this->request->getPost('location'),
+        'complaint_type'    => $this->request->getPost('complaint_type'),
+        'complaint_category'=> $this->request->getPost('complaint_category'),
+        'description'       => $this->request->getPost('description'),
+        'impact'            => $this->request->getPost('impact'),
+        'files'             => !empty($uploadedFileNames) ? json_encode($uploadedFileNames) : null,
+        'resolution'        => $resolutionString,
+        'resolution_other'  => $this->request->getPost('other_resolution'),
+        'status'            => 'pending',
+        'created_at'        => date('Y-m-d H:i:s'),
+        'updated_at'        => date('Y-m-d H:i:s')
+    ];
 
-        $uploadedFileNames = $this->handleFileUploads();
-
-        $resolutions = $this->request->getPost('resolution');
-        $resolutionString = is_array($resolutions) ? implode(',', $resolutions) : $resolutions;
-
-        $data = [
-           'user_id' => session('account_id'),
-            'date'              => $this->request->getPost('date'),
-            'time'              => $this->request->getPost('time'),
-            'location'          => $this->request->getPost('location'),
-            'complaint_type'    => $this->request->getPost('complaint_type'),
-            'complaint_category'=> $this->request->getPost('complaint_category'),
-            'description'       => $this->request->getPost('description'),
-            'impact'            => $this->request->getPost('impact'),
-            'files'             => !empty($uploadedFileNames) ? json_encode($uploadedFileNames) : null,
-            'resolution'        => $resolutionString,
-            'resolution_other'  => $this->request->getPost('other_resolution'),
-            'is_anonymous'      => 0,
-            'status'            => 'pending',
-            'created_at'        => date('Y-m-d H:i:s'),
-            'updated_at'        => date('Y-m-d H:i:s')
-        ];
-
-        if ($complaintModel->insert($data)) {
-            return redirect()->to('/user/view-complaint')
-                ->with('success', 'Complaint filed successfully.');
-        }
-
-        return redirect()->back()
-            ->withInput()
-            ->with('error', 'Failed to file complaint. Please check your input.');
+    // If filing with identity, include user information
+    if ($fileWithIdentity) {
+        $data['user_id'] = session('account_id');
+        $data['is_anonymous'] = 0;
+    } else {
+        // Filing anonymously - don't include user_id
+        $data['user_id'] = null;
+        $data['is_anonymous'] = 1;
     }
+
+    if ($complaintModel->insert($data)) {
+        return redirect()->to('/user/view-complaint')
+            ->with('success', 'Complaint filed successfully.');
+    }
+
+    return redirect()->back()
+        ->withInput()
+        ->with('error', 'Failed to file complaint. Please check your input.');
+}
 
     private function handleFileUploads(): array
     {
@@ -102,82 +113,115 @@ public function userdashboard()
         return $uploadedFiles;
     }
 
-    public function filing_complaint()
-    {
-        log_message('info', 'filing_complaint method called with method: ' . $this->request->getMethod());
+public function filing_complaint()
+{
+    log_message('info', 'filing_complaint method called with method: ' . $this->request->getMethod());
 
-        $accountModel = new AccountModel();
-        $user = $accountModel->find(session('id'));
+    $accountModel = new AccountModel();
+    $studentModel = new StudentModel();
+    $ndaModel     = new NdaModel();
 
-        if ($this->request->getMethod() === 'GET') {
-            return view('user/filing_complaint', ['user' => $user]);
-        }
+    // Get logged-in account
+    $account = $accountModel->find(session('id'));
 
-        if ($this->request->getMethod() === 'POST') {
-            $validation = \Config\Services::validation();
-            $validation->setRules([
-                'date'        => 'required|valid_date',
-                'location'    => 'required|min_length[5]',
-                'description' => 'required|min_length[50]',
-                'complaint_type' => 'required|in_list[academic,non-academic]',
-                'complaint_category' => 'required',
-                'resolution'  => 'required'
-            ]);
+    // Fetch student record linked to this account
+    $student = $studentModel->where('account_id', session('id'))->first();
 
-            if (!$validation->withRequest($this->request)->run()) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('errors', $validation->getErrors());
-            }
+    // ✅ Fetch latest NDA uploaded by any staff account
+    $ndaFile = $ndaModel->select('file_path')
+                        ->join('accounts', 'accounts.id = nda_uploads.account_id')
+                        ->where('accounts.role', 'staff')
+                        ->orderBy('nda_uploads.id', 'DESC')
+                        ->first();
 
-            $resolutions = $this->request->getPost('resolution');
-            $resolutionString = is_array($resolutions) ? implode(',', $resolutions) : $resolutions;
-
-            $data = [
-                'user_id' => session('account_id'),
-
-                'date'              => $this->request->getPost('date'),
-                'location'          => $this->request->getPost('location'),
-                'complaint_type'    => $this->request->getPost('complaint_type'),
-                'complaint_category'=> $this->request->getPost('complaint_category'),
-                'description'       => $this->request->getPost('description'),
-                'impact'            => $this->request->getPost('impact'),
-                'resolution'        => $resolutionString,
-                'resolution_other'  => $this->request->getPost('other_resolution'),
-                'files'             => null,
-                'is_anonymous'      => $this->request->getPost('is_anonymous') ? 1 : 0,
-                'status'            => 'pending',
-                'created_at'        => date('Y-m-d H:i:s'),
-                'updated_at'        => date('Y-m-d H:i:s')
-            ];
-
-            $uploadedFiles = $this->handleFileUploads();
-            if (!empty($uploadedFiles)) {
-                $data['files'] = json_encode($uploadedFiles);
-            }
-
-            try {
-                $complaintModel = new ComplaintModel();
-                $result = $complaintModel->insert($data);
-
-                if ($result) {
-                    return redirect()->to(base_url('user/filing-complaint'))
-                        ->with('success', 'Complaint submitted successfully! Your complaint ID is: ' . $result);
-                } else {
-                    return redirect()->back()
-                        ->withInput()
-                        ->with('error', 'Failed to submit complaint. Please try again.');
-                }
-            } catch (\Exception $e) {
-                log_message('error', 'Database error in filing_complaint: ' . $e->getMessage());
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Database error occurred. Please try again.');
-            }
-        }
-
-        return redirect()->to(base_url('user/filing-complaint'));
+    if ($this->request->getMethod() === 'GET') {
+        return view('user/filing_complaint', [
+            'account' => $account,
+            'student' => $student,
+            'nda'     => $ndaFile   // ✅ fixed: pass $ndaFile instead of $nda
+        ]);
     }
+
+    if ($this->request->getMethod() === 'POST') {
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'date'              => 'required|valid_date',
+            'location'          => 'required|min_length[5]',
+            'description'       => 'required|min_length[50]',
+            'complaint_type'    => 'required|in_list[academic,non-academic]',
+            'complaint_category'=> 'required',
+            'resolution'        => 'required'
+        ]);
+
+        if (!$validation->withRequest($this->request)->run()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('errors', $validation->getErrors());
+        }
+
+        $resolutions = $this->request->getPost('resolution');
+        $resolutionString = is_array($resolutions) ? implode(',', $resolutions) : $resolutions;
+
+        $data = [
+            'user_id'           => session('account_id'),
+            'contact_number'    => $this->request->getPost('contact_number') ?? ($student['contact_number'] ?? null),
+            'nda_file'          => $ndaFile['file_path'] ?? null, // ✅ safely include NDA
+            'date'              => $this->request->getPost('date'),
+            'location'          => $this->request->getPost('location'),
+            'complaint_type'    => $this->request->getPost('complaint_type'),
+            'complaint_category'=> $this->request->getPost('complaint_category'),
+            'description'       => $this->request->getPost('description'),
+            'impact'            => $this->request->getPost('impact'),
+            'resolution'        => $resolutionString,
+            'resolution_other'  => $this->request->getPost('other_resolution'),
+            'files'             => null,
+            'is_anonymous'      => $this->request->getPost('is_anonymous') ? 1 : 0,
+            'status'            => 'pending',
+            'created_at'        => date('Y-m-d H:i:s'),
+            'updated_at'        => date('Y-m-d H:i:s')
+        ];
+
+        // Handle user supporting documents upload
+        $uploadedFiles = $this->handleFileUploads();
+        if (!empty($uploadedFiles)) {
+            $data['files'] = json_encode($uploadedFiles);
+        }
+
+        try {
+            $complaintModel = new ComplaintModel();
+            $result = $complaintModel->insert($data);
+
+            if ($result) {
+                return redirect()->to(base_url('user/filing-complaint'))
+                    ->with('success', 'Complaint submitted successfully! Your complaint ID is: ' . $result);
+            } else {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Failed to submit complaint. Please try again.');
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Database error in filing_complaint: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Database error occurred. Please try again.');
+        }
+    }
+
+    return redirect()->to(base_url('user/filing-complaint'));
+}
+public function viewNda($filename)
+{
+    $filePath = WRITEPATH . 'uploads/nda/' . $filename;
+
+    if (!file_exists($filePath)) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+    }
+
+    return $this->response->download($filePath, null)->setFileName($filename);
+}
+
+
+
 
     public function appointment()
     {

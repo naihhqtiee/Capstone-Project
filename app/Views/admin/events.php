@@ -366,6 +366,207 @@
             justify-content: center;
             animation: pulse 2s infinite;
         }
+        .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.95) translateY(20px);
+    transition: all 0.3s ease;
+    margin: 20px;
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    padding: 24px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.2;
+    flex: 1;
+    margin-right: 16px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.modal-close:hover {
+    background-color: #f1f5f9;
+    color: #374151;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+/* View Modal Specific Styles */
+.event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-icon {
+    font-size: 18px;
+    width: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.detail-content {
+    flex: 1;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.detail-value {
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.file-attachment {
+    margin-top: 8px;
+}
+
+.file-attachment img {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    width: 100%;
+    object-fit: contain;
+    border: 1px solid #e2e8f0;
+}
+
+.modal-footer {
+    padding: 0 24px 24px;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 16px;
+    padding-top: 16px;
+}
+
+.timestamp-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Edit Modal Specific Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: #ffffff;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-submit {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.form-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
 
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -927,7 +1128,8 @@
                         <div class="stat-icon cyan">
                             <i class='bx bx-calendar'></i>
                         </div>
-                        <div class="stat-number">12</div>
+                        <div class="stat-number"><?= count($upcomingEvents ?? []) ?>
+</div>
                         <div class="stat-label">Upcoming Events</div>
                         <div class="stat-change positive">↑ +15%</div>
                     </div>
@@ -935,7 +1137,8 @@
                         <div class="stat-icon blue">
                             <i class='bx bx-play-circle'></i>
                         </div>
-                        <div class="stat-number">3</div>
+                        <div class="stat-number"><?= count($ongoingEvents ?? []) ?>
+</div>
                         <div class="stat-label">Ongoing Events</div>
                         <div class="stat-change positive">↑ +25%</div>
                     </div>
@@ -943,7 +1146,8 @@
                         <div class="stat-icon green">
                             <i class='bx bx-check-circle'></i>
                         </div>
-                        <div class="stat-number">48</div>
+                        <div class="stat-number"><?= count($completedEvents ?? []) ?>
+</div>
                         <div class="stat-label">Completed Events</div>
                         <div class="stat-change positive">↑ +20%</div>
                     </div>
@@ -951,7 +1155,7 @@
                         <div class="stat-icon purple">
                             <i class='bx bx-group'></i>
                         </div>
-                        <div class="stat-number">2,456</div>
+                        <div class="stat-number"><?= esc($totalAttendees ?? 0) ?></div>
                         <div class="stat-label">Total Attendees</div>
                         <div class="stat-change positive">↑ +18%</div>
                     </div>
@@ -959,7 +1163,7 @@
                         <div class="stat-icon orange">
                             <i class='bx bx-chart'></i>
                         </div>
-                        <div class="stat-number">63</div>
+                        <div class="stat-number"><?= esc($totalEvents ?? 0) ?></div>
                         <div class="stat-label">Total Events</div>
                         <div class="stat-change positive">↑ +12%</div>
                     </div>
@@ -992,14 +1196,15 @@
                 </div>
 
                 <!-- Events Table -->
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3 class="table-title">All Events</h3>
-                        <button class="btn btn-primary">
-                            <i class='bx bx-plus'></i>
-                            Create Event
-                        </button>
-                    </div>
+<div class="table-container">
+    <div class="table-header">
+        <h3 class="table-title">All Events</h3>
+        <button class="btn btn-primary">
+            <i class='bx bx-plus'></i>
+            Create Event
+        </button>
+    </div>
+
 <table>
     <thead>
         <tr>
@@ -1085,93 +1290,379 @@
     </tbody>
 </table>
 
-
-                </div>
-            </div>
-        </div>
+<!-- ✅ EDIT EVENT MODAL -->
+<div id="editModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Event</h2>
+      <button id="closeEditModal" class="modal-close">&times;</button>
     </div>
+    <div class="modal-body">
+      <form id="editEventForm">
+        <input type="hidden" name="id" id="editEventId">
 
-    <script>
-        // Loading screen
-        window.addEventListener('load', function() {
+        <div class="form-group">
+          <label class="form-label">Event Name</label>
+          <input type="text" name="event_name" id="editEventName" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" id="editEventDescription" class="form-input form-textarea"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" id="editEventLocation" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" name="start_date" id="editStartDate" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input type="date" name="end_date" id="editEndDate" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Audience</label>
+          <input type="text" name="audience" id="editEventAudience" class="form-input">
+        </div>
+
+        <button type="submit" class="form-submit">
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Updated View Modal HTML -->
+<div id="eventModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalEventName"></h2>
+      <button id="closeModal" class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="event-details">
+        <div class="detail-item">
+          <span class="detail-icon">📄</span>
+          <div class="detail-content">
+            <div class="detail-label">Description</div>
+            <div class="detail-value" id="modalEventDescription"></div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-icon">📅</span>
+          <div class="detail-content">
+            <div class="detail-label">Start Date & Time</div>
+            <div class="detail-value">
+              <span id="modalStartDate"></span> <span id="modalStartTime"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-icon">📅</span>
+          <div class="detail-content">
+            <div class="detail-label">End Date & Time</div>
+            <div class="detail-value">
+              <span id="modalEndDate"></span> <span id="modalEndTime"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-icon">📍</span>
+          <div class="detail-content">
+            <div class="detail-label">Location</div>
+            <div class="detail-value" id="modalLocation"></div>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-icon">👥</span>
+          <div class="detail-content">
+            <div class="detail-label">Audience</div>
+            <div class="detail-value" id="modalAudience"></div>
+          </div>
+        </div>
+
+        <div id="modalFileWrapper" class="detail-item hidden">
+          <span class="detail-icon">📎</span>
+          <div class="detail-content">
+            <div class="detail-label">Attachment</div>
+            <div class="file-attachment">
+              <img id="modalFile" src="" alt="Event Attachment">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="timestamp-info">
+        <span>Created: <span id="modalCreatedAt"></span></span>
+        <span>Updated: <span id="modalUpdatedAt"></span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    // Loading screen
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            document.getElementById('loadingScreen').style.opacity = '0';
             setTimeout(() => {
-                document.getElementById('loadingScreen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').style.display = 'none';
-                }, 500);
-            }, 1000);
-        });
+                document.getElementById('loadingScreen').style.display = 'none';
+            }, 500);
+        }, 1000);
+    });
 
-        // Sidebar toggle functionality
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
+    // Sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
 
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    });
+
+    // Mobile sidebar toggle
+    if (window.innerWidth <= 768) {
         sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            sidebar.classList.toggle('show');
         });
+    }
 
-        // Mobile sidebar toggle
-        if (window.innerWidth <= 768) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-            });
+    // Logout confirmation
+    function confirmLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            console.log('Logging out...');
         }
+    }
 
-        // Logout confirmation
-        function confirmLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // Add your logout logic here
-                console.log('Logging out...');
-            }
-        }
+document.addEventListener('DOMContentLoaded', function () {
+    // Enhanced modal animation functions
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+        
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+    }
 
-        // Add click handlers for action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const action = this.classList.contains('view') ? 'View' : 
-                              this.classList.contains('edit') ? 'Edit' : 'Delete';
-                const row = this.closest('tr');
-                const id = row.cells[0].textContent;
-                
-                if (action === 'Delete') {
-                    if (confirm(`Are you sure you want to delete event ${id}?`)) {
-                        console.log(`${action} event ${id}`);
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
+
+    // EVENT ACTIONS (View, Edit, Delete)
+    // VIEW BUTTON
+    document.querySelectorAll('.action-btn.view').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const eventId = this.dataset.id;
+
+            fetch(`/admin/events/view/${eventId}`)
+                .then(res => res.json())
+                .then(event => {
+                    if (event.error) {
+                        alert(event.error);
+                        return;
                     }
-                } else {
-                    console.log(`${action} event ${id}`);
-                }
-            });
-        });
 
-        // Search functionality
-        document.querySelector('.action-bar .search-box input').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
+                    // Fill modal content
+                    document.getElementById('modalEventName').innerText = event.event_name;
+                    document.getElementById('modalEventDescription').innerText = event.description;
+                    document.getElementById('modalStartDate').innerText = event.start_date;
+                    document.getElementById('modalStartTime').innerText = event.start_time ?? '';
+                    document.getElementById('modalEndDate').innerText = event.end_date;
+                    document.getElementById('modalEndTime').innerText = event.end_time ?? '';
+                    document.getElementById('modalLocation').innerText = event.location;
+                    document.getElementById('modalAudience').innerText = event.audience;
+                    document.getElementById('modalCreatedAt').innerText = event.created_at ?? '—';
+                    document.getElementById('modalUpdatedAt').innerText = event.updated_at ?? '—';
+
+                    // Handle attachment
+                    if (event.file_url) {
+                        document.getElementById('modalFile').src = event.file_url;
+                        document.getElementById('modalFileWrapper').classList.remove('hidden');
+                    } else {
+                        document.getElementById('modalFileWrapper').classList.add('hidden');
+                    }
+
+                    openModal('eventModal');
+                })
+                .catch(error => {
+                    console.error('Error fetching event:', error);
+                    alert('Error loading event details');
+                });
+        });
+    });
+
+    // CLOSE VIEW MODAL
+    document.getElementById('closeModal').addEventListener('click', () => {
+        closeModal('eventModal');
+    });
+
+    // Close modal when clicking background
+    document.getElementById('eventModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeModal('eventModal');
+        }
+    });
+
+    // EDIT BUTTON
+    document.querySelectorAll('.action-btn.edit').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const eventId = this.dataset.id;
+            fetch(`/admin/events/view/${eventId}`)
+                .then(res => res.json())
+                .then(event => {
+                    if (event.error) {
+                        alert(event.error);
+                        return;
+                    }
+                    
+                    document.getElementById('editEventId').value = event.id;
+                    document.getElementById('editEventName').value = event.event_name;
+                    document.getElementById('editEventDescription').value = event.description;
+                    document.getElementById('editEventLocation').value = event.location;
+                    document.getElementById('editStartDate').value = event.start_date;
+                    document.getElementById('editEndDate').value = event.end_date;
+                    document.getElementById('editEventAudience').value = event.audience;
+                    
+                    openModal('editModal');
+                })
+                .catch(error => {
+                    console.error('Error fetching event:', error);
+                    alert('Error loading event details');
+                });
+        });
+    });
+
+    // CLOSE EDIT MODAL
+    document.getElementById('closeEditModal').addEventListener('click', () => {
+        closeModal('editModal');
+    });
+
+    // Close edit modal when clicking background
+    document.getElementById('editModal').addEventListener('click', function (e) {
+        if (e.target === this) {
+            closeModal('editModal');
+        }
+    });
+
+    // EDIT FORM SUBMISSION
+    document.getElementById('editEventForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector('.form-submit');
+        const originalText = submitBtn.textContent;
+        
+        // Show loading state
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+
+        fetch(`/admin/events/update`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(response => {
+            alert(response.message);
+            if (response.success) {
+                closeModal('editModal');
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error updating event:', error);
+            alert('Error updating event');
+        })
+        .finally(() => {
+            // Reset button state
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+
+    // DELETE BUTTON
+    document.querySelectorAll('.action-btn.delete').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const eventName = this.closest('tr').querySelector('.event-title').textContent;
             
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-
-        // Filter buttons functionality
-        document.querySelectorAll('.filter-buttons .btn-outline').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Add filter logic here
-                console.log('Filter clicked:', this.textContent.trim());
-            });
-        });
-
-        // Export functionality
-        document.querySelector('.btn-primary')?.addEventListener('click', function() {
-            if (this.textContent.includes('Export')) {
-                console.log('Exporting data...');
-                // Add export logic here
+            if (confirm(`Are you sure you want to delete the event "${eventName}"? This action cannot be undone.`)) {
+                fetch(`/admin/events/delete/${this.dataset.id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json())
+                .then(response => {
+                    alert(response.message);
+                    if (response.success) location.reload();
+                })
+                .catch(error => {
+                    console.error('Error deleting event:', error);
+                    alert('Error deleting event');
+                });
             }
         });
-    </script>
+    });
+
+    // ESC key to close modals
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const viewModal = document.getElementById('eventModal');
+            const editModal = document.getElementById('editModal');
+            
+            if (viewModal.classList.contains('show')) {
+                closeModal('eventModal');
+            }
+            if (editModal.classList.contains('show')) {
+                closeModal('editModal');
+            }
+        }
+    });
+});
+
+// Search functionality
+document.querySelector('.action-bar .search-box input')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+// Filter buttons functionality
+document.querySelectorAll('.filter-buttons .btn-outline')?.forEach(btn => {
+    btn.addEventListener('click', function() {
+        console.log('Filter clicked:', this.textContent.trim());
+    });
+});
+
+// Export functionality
+document.querySelector('.btn-primary')?.addEventListener('click', function() {
+    if (this.textContent.includes('Export')) {
+        console.log('Exporting data...');
+    }
+});
+</script>
+
 </body>
 </html>

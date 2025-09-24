@@ -62,6 +62,7 @@ $routes->post('user/changePassword', 'User::changePassword');
 $routes->post('user/saveIdentified', 'User::saveIdentified');
 $routes->get('complaint/edit/(:num)', 'ComplaintController::edit/$1');
 $routes->post('complaint/update/(:num)', 'ComplaintController::update/$1');
+$routes->post('user/saveIdentified', 'User::saveIdentified');
 
 // Appointment
 $routes->post('appointment/set', 'AppointmentController::set');
@@ -84,17 +85,23 @@ $routes->group('admin', function ($routes) {
     $routes->get('dashboard', 'AdminController::dashboard');
     $routes->get('users', 'AdminController::users');
     $routes->get('new-users', 'AdminController::newUsers');
-    $routes->get('complaints', 'AdminController::complaints'); // ✅ THIS IS YOUR ROUTE
-      $routes->get('events', 'AdminController::events'); // 
-      $routes->get('students', 'AdminController::students');
-       $routes->get('chre_staff', 'AdminController::chreStaff');
-       $routes->get('notifications', 'AdminController::fetchNotifications');
-       $routes->get('complaints/view/(:num)', 'AdminController::viewComplaint/$1');
-$routes->match(['get','post'], 'complaints/edit/(:num)', 'AdminController::editComplaint/$1');
-$routes->get('complaints/delete/(:num)', 'AdminController::deleteComplaint/$1');
+    $routes->get('complaints', 'AdminController::complaints');
+    $routes->get('events', 'AdminController::events'); 
+    $routes->get('students', 'AdminController::students'); 
+    $routes->get('chre_staff', 'AdminController::chreStaff'); 
+    $routes->get('notifications', 'AdminController::fetchNotifications');
+    $routes->get('complaints/view/(:num)', 'AdminController::viewComplaint/$1');
+    $routes->match(['get','post'], 'complaints/edit/(:num)', 'AdminController::editComplaint/$1');
+    $routes->get('complaints/view/(:num)', 'AdminController::viewComplaint/$1');
+    $routes->get('complaints/delete/(:num)', 'AdminController::deleteComplaint/$1');
 
-
+    $routes->get('events', 'AdminController::events');
+    $routes->get('events/view/(:num)', 'EventsController::view/$1');
+    $routes->get('events/edit/(:num)', 'EventsController::edit/$1');
+    $routes->post('events/update', 'EventsController::update');  // ✅ FIXED
+    $routes->delete('events/delete/(:num)', 'EventsController::delete/$1');
 });
+
 
 
 // ==================== 
@@ -105,6 +112,12 @@ $routes->group('staff', ['filter' => 'auth'], function ($routes) {
     $routes->get('anonymous', 'StaffController::anonymous');
     $routes->get('identified', 'ComplaintController::identifiedForm');
     $routes->get('complaints', 'StaffController::complaints');
+    $routes->post('upload-nda', 'StaffController::uploadNda');
+    $routes->get('nda', 'StaffController::ndaManagement');
+$routes->get('view-nda', 'StaffController::viewNda');
+$routes->get('download-nda', 'StaffController::downloadNda');
+$routes->post('delete-nda/(:num)', 'StaffController::deleteNda/$1');
+
 
 
     // OPCR Checklist
@@ -141,6 +154,7 @@ $routes->group('staff', ['filter' => 'auth'], function ($routes) {
     // Other actions
     $routes->post('appointment/delete/(:num)', 'AppointmentController::delete/$1');
     $routes->post('complaint/saveIdentified', 'ComplaintController::saveIdentified');
+    
 });
 
 // ==================== 
@@ -174,3 +188,4 @@ $routes->post('appointments/delete/(:num)', 'AppointmentController::delete/$1');
 // Debug
 // ==================== 
 $routes->get('debug/upload', 'EventsController::checkUpload');
+

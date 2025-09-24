@@ -27,23 +27,6 @@ class ComplaintController extends BaseController
         $this->complaintModel = new ComplaintModel();
     }
 
-    public function complaintChoice()
-    {
-        return view('complaint/complaint_choice');
-    }
-
-    public function anonymousForm()
-    {
-        return view('complaint/anonymous_form');
-    }
-
-
-
-    public function identifiedForm()
-    {
-        return view('staff/identified');
-    }
-
     /**
      * List complaints for the logged-in user
      */
@@ -70,24 +53,6 @@ class ComplaintController extends BaseController
 
         return view('staff/anonymous', ['complaints' => $complaints]);
     }
-
-    /**
-     * View single anonymous complaint
-     */
-    public function viewAnonymous($id)
-    {
-        $complaint = $this->complaintModel->find($id);
-
-        if (!$complaint) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Complaint not found");
-        }
-
-        return view('staff/anonymous_view', ['complaint' => $complaint]);
-    }
-
-    /**
-     * Save anonymous complaint
-     */
     private function getAnonymousValidationRules(): array
     {
         return [
@@ -212,7 +177,7 @@ class ComplaintController extends BaseController
             session()->setFlashdata('error', 'Failed to delete complaint.');
         }
 
-        return redirect()->to('/staff/anonymous');
+        return redirect()->to('/staff/complaints');
     }
 
     /**

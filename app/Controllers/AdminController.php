@@ -251,26 +251,58 @@ public function deleteComplaint($id)
 
 public function events()
 {
-    $complaintModel = new \App\Models\ComplaintModel();
-    $eventModel     = new \App\Models\EventModel();
-    $studentModel   = new \App\Models\StudentModel();
-    $chreStaffModel = new \App\Models\ChreStaffModel();
-    $accountModel   = new \App\Models\AccountModel(); // ✅ ADDED
+    $complaintModel        = new \App\Models\ComplaintModel();
+    $eventModel            = new \App\Models\EventModel();
+    $studentModel          = new \App\Models\StudentModel();
+    $chreStaffModel        = new \App\Models\ChreStaffModel();
+    $accountModel          = new \App\Models\AccountModel();
+    $eventRegistrationModel = new \App\Models\EventRegistrationModel(); // ✅ NEW
 
+    $today = date('Y-m-d');
+
+    // Get events (only active)
     $events = $eventModel
         ->where('status', 'active')
         ->orderBy('start_date', 'ASC')
         ->findAll();
 
+    // Calculate upcoming, ongoing, and completed events
+    $upcomingEvents  = $eventModel
+        ->where('start_date >', $today)
+        ->where('status', 'active')
+        ->findAll();
+
+    $ongoingEvents = $eventModel
+        ->where('start_date <=', $today)
+        ->where('end_date >=', $today)
+        ->where('status', 'active')
+        ->findAll();
+
+    $completedEvents = $eventModel
+        ->where('end_date <', $today)
+        ->where('status', 'active')
+        ->findAll();
+
+    // ✅ Real-time total events
+    $totalEvents = count($events);
+
+    // ✅ Total attendees from event_registrations table
+    $totalAttendees = $eventRegistrationModel->countAllResults();
+
     return view('admin/events', [
-        'events'        => $events,
-        'total'         => $complaintModel->countAllResults(),
-        'totalStudents' => $studentModel->countAllResults(),
-        'totalChreStaff'=> $chreStaffModel->countAllResults(),
-        'totalEvents'   => $eventModel->countAllResults(),
-        'totalUsers'    => $accountModel->countAllResults() // ✅ FIXED
+        'events'          => $events,
+        'upcomingEvents'  => $upcomingEvents,
+        'ongoingEvents'   => $ongoingEvents,
+        'completedEvents' => $completedEvents,
+        'total'           => $complaintModel->countAllResults(),
+        'totalStudents'   => $studentModel->countAllResults(),
+        'totalChreStaff'  => $chreStaffModel->countAllResults(),
+        'totalEvents'     => $totalEvents,
+        'totalAttendees'  => $totalAttendees, // ✅ PASS TO VIEW
+        'totalUsers'      => $accountModel->countAllResults()
     ]);
 }
+
 
 public function students()
 {
