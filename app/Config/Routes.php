@@ -90,17 +90,23 @@ $routes->group('admin', function ($routes) {
     $routes->get('students', 'AdminController::students'); 
     $routes->get('chre_staff', 'AdminController::chreStaff'); 
     $routes->get('notifications', 'AdminController::fetchNotifications');
-    $routes->get('complaints/view/(:num)', 'AdminController::viewComplaint/$1');
-    $routes->match(['get','post'], 'complaints/edit/(:num)', 'AdminController::editComplaint/$1');
-    $routes->get('complaints/view/(:num)', 'AdminController::viewComplaint/$1');
-    $routes->get('complaints/delete/(:num)', 'AdminController::deleteComplaint/$1');
+    $routes->get('students/view/(:num)', 'AdminController::viewStudent/$1');
+    $routes->get('students/edit/(:num)', 'AdminController::editStudent/$1');
+    $routes->post('students/delete/(:num)', 'AdminController::deleteStudent/$1');
 
-    $routes->get('events', 'AdminController::events');
+    // Complaints
+     $routes->get('complaints/view/(:num)', 'ComplaintController::view/$1'); 
+$routes->post('complaints/delete/(:num)', 'AdminController::deleteComplaint/$1');
+    $routes->match(['get','post'], 'complaints/edit/(:num)', 'AdminController::editComplaint/$1');
+ 
+
+    // Events
     $routes->get('events/view/(:num)', 'EventsController::view/$1');
     $routes->get('events/edit/(:num)', 'EventsController::edit/$1');
-    $routes->post('events/update', 'EventsController::update');  // ✅ FIXED
+    $routes->post('events/update', 'EventsController::update');  
     $routes->delete('events/delete/(:num)', 'EventsController::delete/$1');
 });
+
 
 
 
@@ -117,6 +123,9 @@ $routes->group('staff', ['filter' => 'auth'], function ($routes) {
 $routes->get('view-nda', 'StaffController::viewNda');
 $routes->get('download-nda', 'StaffController::downloadNda');
 $routes->post('delete-nda/(:num)', 'StaffController::deleteNda/$1');
+$routes->get('view-nda/(:num)', 'StaffController::viewNda/$1');
+$routes->get('download-nda/(:num)', 'StaffController::downloadNda/$1');
+
 
 
 

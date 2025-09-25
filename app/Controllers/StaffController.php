@@ -6,7 +6,7 @@ use App\Models\ComplaintModel;
 use App\Models\AppointmentModel;
 use App\Models\StudentModel;
 use App\Models\EventModel;
-
+use App\Models\NdaModel;
 class StaffController extends BaseController
 {
     public function dashboard()
@@ -259,16 +259,19 @@ public function ndaManagement()
     ]);
 }
 
-public function viewNda()
+public function viewNda($id)
 {
-    $ndaModel = new NdaModel();
-    $ndaFile = $ndaModel->orderBy('uploaded_at', 'DESC')->first();
+    $ndaModel = new \App\Models\NdaModel();
+    $ndaFile = $ndaModel->find($id);
 
     if (!$ndaFile || !file_exists(FCPATH . $ndaFile['file_path'])) {
         return redirect()->back()->with('error', 'NDA file not found.');
     }
 
-    return $this->response->download(FCPATH . $ndaFile['file_path'], null)->setFileName('nda.pdf');
+    // Show directly in browser
+    return $this->response
+                ->setContentType('application/pdf')
+                ->setBody(file_get_contents(FCPATH . $ndaFile['file_path']));
 }
 
 public function downloadNda()
@@ -301,6 +304,10 @@ public function deleteNda($id)
 
     return redirect()->back()->with('error', 'NDA not found.');
 }
+
+
+
+
 
 
 }

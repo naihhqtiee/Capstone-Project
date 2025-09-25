@@ -109,57 +109,79 @@ class ComplaintController extends BaseController
     /**
      * View complaint (generate PDF)
      */
-    public function view($id)
-    {
-        $complaint = $this->complaintModel->find($id);
+public function view($id)
+{
+    $complaint = $this->complaintModel
+        ->select('complaints.*, students.first_name, students.mi, students.last_name, students.email, students.contact_number')
+        ->join('accounts', 'accounts.id = complaints.user_id', 'left')
+        ->join('students', 'students.account_id = accounts.id', 'left')
+        ->find($id);
 
-        if (!$complaint) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Complaint not found");
-        }
-
-        $complaint['files'] = json_decode($complaint['files'], true);
-
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-
-        $dompdf = new Dompdf($options);
-
-        $html = "
-            <h2 style='text-align:center;'>Complaint Report</h2>
-            <p><strong>Date:</strong> {$complaint['date']}</p>";
-
-        // ✅ Show time only if exists (identified complaint)
-        if (!empty($complaint['time'])) {
-            $html .= "<p><strong>Time:</strong> {$complaint['time']}</p>";
-        }
-
-        $html .= "
-            <p><strong>Location:</strong> {$complaint['location']}</p>
-            <p><strong>Type:</strong> {$complaint['complaint_type']}</p>
-            <p><strong>Category:</strong> {$complaint['complaint_category']}</p>
-            <p><strong>Description:</strong> {$complaint['description']}</p>
-            <p><strong>Impact:</strong> {$complaint['impact']}</p>
-            <p><strong>Resolution:</strong> {$complaint['resolution']}</p>";
-
-        if (!empty($complaint['resolution_other'])) {
-            $html .= "<p><strong>Resolution (Other):</strong> {$complaint['resolution_other']}</p>";
-        }
-
-        if (!empty($complaint['files'])) {
-            $html .= "<p><strong>Attached Files:</strong></p><ul>";
-            foreach ($complaint['files'] as $file) {
-                $fileUrl = base_url('uploads/complaints/' . $file);
-                $html .= "<li><a href='{$fileUrl}'>{$file}</a></li>";
-            }
-            $html .= "</ul>";
-        }
-
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
-        $dompdf->stream("complaint_report_{$id}.pdf", ["Attachment" => false]);
+    if (!$complaint) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Complaint not found");
     }
+
+    $complaint['files'] = json_decode($complaint['files'], true);
+
+    $options = new \Dompdf\Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+
+    $dompdf = new \Dompdf\Dompdf($options);
+
+    // Build complainant full name
+    $fullName = (!empty($complaint['first_name']))
+        ? "{$complaint['first_name']} " . (!empty($complaint['mi']) ? $complaint['mi'] . ". " : "") . "{$complaint['last_name']}"
+        : "Anonymous";
+
+    $html = "
+        <h2 style='text-align:center;'>Complaint Report</h2>
+        <p><strong>Date:</strong> {$complaint['date']}</p>";
+
+    if (!empty($complaint['time'])) {
+        $html .= "<p><strong>Time:</strong> {$complaint['time']}</p>";
+    }
+
+    $html .= "
+        <p><strong>Location:</strong> {$complaint['location']}</p>
+        <p><strong>Type:</strong> {$complaint['complaint_type']}</p>
+        <p><strong>Category:</strong> {$complaint['complaint_category']}</p>
+        <p><strong>Description:</strong> {$complaint['description']}</p>
+        <p><strong>Impact:</strong> {$complaint['impact']}</p>
+        <p><strong>Resolution:</strong> {$complaint['resolution']}</p>";
+
+    if (!empty($complaint['resolution_other'])) {
+        $html .= "<p><strong>Resolution (Other):</strong> {$complaint['resolution_other']}</p>";
+    }
+
+    // ✅ Add complainant details if not anonymous
+    if ($complaint['is_anonymous'] == 0 && !empty($complaint['first_name'])) {
+        $html .= "
+            <h3>Complainant Details</h3>
+            <p><strong>Name:</strong> {$fullName}</p>
+            <p><strong>Email:</strong> {$complaint['email']}</p>
+            <p><strong>Contact:</strong> {$complaint['contact_number']}</p>";
+    } else {
+        $html .= "<p><strong>Complainant:</strong> Anonymous</p>";
+    }
+
+    if (!empty($complaint['files'])) {
+        $html .= "<p><strong>Attached Files:</strong></p><ul>";
+        foreach ($complaint['files'] as $file) {
+            $fileUrl = base_url('uploads/complaints/' . $file);
+            $html .= "<li><a href='{$fileUrl}'>{$file}</a></li>";
+        }
+        $html .= "</ul>";
+    }
+
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $dompdf->stream("complaint_report_{$id}.pdf", ["Attachment" => false]);
+}
+
+
+
 
     /**
      * Delete a complaint

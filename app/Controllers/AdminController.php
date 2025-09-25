@@ -143,13 +143,6 @@ class AdminController extends BaseController
         return redirect()->to('/admin/users')->with('success', 'User deleted successfully!');
     }
 
-    public function pendingRegistrations()
-    {
-        $model = new StudentModel();
-        $data['registrations'] = $model->findAll();
-        return view('admin/pending_registrations', $data);
-    }
-
     public function complaints()
     {
         $model = new ComplaintModel();
@@ -323,6 +316,42 @@ public function students()
         'totalUsers'     => $accountModel->countAllResults() // ✅ FIXED
     ]);
 }
+public function viewStudent($id)
+{
+    $studentModel = new \App\Models\StudentModel();
+    $student = $studentModel->find($id);
+
+    if (!$student) {
+        return redirect()->to('admin/students')->with('error', 'Student not found.');
+    }
+
+    return view('admin/students/view', ['student' => $student]);
+}
+
+public function editStudent($id)
+{
+    $studentModel = new \App\Models\StudentModel();
+    $student = $studentModel->find($id);
+
+    if (!$student) {
+        return redirect()->to('admin/students')->with('error', 'Student not found.');
+    }
+
+    return view('admin/students/edit', ['student' => $student]);
+}
+
+public function deleteStudent($id)
+{
+    $studentModel = new \App\Models\StudentModel();
+
+    if ($studentModel->find($id)) {
+        $studentModel->delete($id);
+        return redirect()->to('admin/students')->with('success', 'Student deleted successfully.');
+    }
+
+    return redirect()->to('admin/students')->with('error', 'Student not found.');
+}
+
 
 public function chreStaff()
 {

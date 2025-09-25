@@ -1048,17 +1048,32 @@
             <!-- Actions -->
 <td>
     <div class="action-buttons">
-        <a href="<?= base_url('admin/complaints/view/'.$complaint['id']) ?>" class="action-btn view">
+        <!-- View -->
+        <a href="<?= base_url('admin/complaints/view/'.$complaint['id']) ?>" 
+           class="action-btn view" title="View">
             <i class='bx bx-show'></i>
         </a>
-        <a href="<?= base_url('admin/complaints/edit/ '.$complaint['id']) ?>" class="action-btn edit">
+
+        <!-- Edit -->
+        <a href="<?= base_url('admin/complaints/edit/'.$complaint['id']) ?>" 
+           class="action-btn edit" title="Edit">
             <i class='bx bx-edit'></i>
         </a>
-        <a href="<?= base_url('admin/complaints/delete/'.$complaint['id']) ?>" class="action-btn delete" onclick="return confirm('Are you sure you want to delete this complaint?')">
-            <i class='bx bx-trash'></i>
-        </a>
+
+        <!-- Delete (POST) -->
+       <form action="<?= base_url('admin/complaints/delete/'.$complaint['id']) ?>" 
+      method="post" 
+      style="display:inline;" 
+      onsubmit="return confirm('Are you sure you want to delete this complaint?');">
+    <?= csrf_field() ?>
+    <button type="submit" class="action-btn delete" title="Delete">
+        <i class='bx bx-trash'></i>
+    </button>
+</form>
+
     </div>
 </td>
+
 
         </tr>
     <?php endforeach; ?>
@@ -1115,23 +1130,15 @@
 
         // Add click handlers for action buttons
 // Add click handlers for action buttons
-document.querySelectorAll('.action-btn').forEach(btn => {
+// Only handle delete buttons
+document.querySelectorAll('form .action-btn.delete').forEach(btn => {
     btn.addEventListener('click', function(e) {
-        e.preventDefault();  // 🚨 THIS BLOCKS YOUR LINKS
-        const action = this.classList.contains('view') ? 'View' : 
-                      this.classList.contains('edit') ? 'Edit' : 'Delete';
-        const row = this.closest('tr');
-        const id = row.cells[0].textContent;
-        
-        if (action === 'Delete') {
-            if (confirm(`Are you sure you want to delete complaint ${id}?`)) {
-                console.log(`${action} complaint ${id}`);
-            }
-        } else {
-            console.log(`${action} complaint ${id}`);
+        if (!confirm('Are you sure you want to delete this complaint?')) {
+            e.preventDefault();
         }
     });
 });
+
 
 
         // Search functionality

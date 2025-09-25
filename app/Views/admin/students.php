@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students Management</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4e73df;
@@ -64,13 +65,196 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Layout */
+        /* Enhanced Modal Styles */
+        .modal-content {
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border: none;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border: none;
+            position: relative;
+        }
+
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-close {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fc 100%);
+        }
+
+        /* View Modal Styles */
+        .student-detail-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .student-detail-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f3f4;
+            transition: all 0.3s ease;
+        }
+
+        .student-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-detail-item:hover {
+            background: #f8f9fc;
+            margin: 0 -15px;
+            padding-left: 15px;
+            padding-right: 15px;
+            border-radius: 10px;
+        }
+
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--purple-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 20px;
+            font-size: 18px;
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--secondary-color);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        /* Form Styles for Edit Modal */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.1);
+            background: white;
+        }
+
+        .modal-footer {
+            background: #f8f9fc;
+            border: none;
+            padding: 25px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--purple-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(78, 115, 223, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fc;
+            color: var(--text-color);
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        /* Layout Styles - Simplified version */
         .layout {
             display: flex;
             min-height: 100vh;
         }
 
-        /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
             background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 100%);
@@ -98,7 +282,6 @@
             display: none;
         }
 
-        /* Logo Section */
         .logo-section {
             padding: 1.5rem 1rem;
             text-align: center;
@@ -126,7 +309,6 @@
             transition: opacity 0.3s ease;
         }
 
-        /* User Profile Section */
         .user-profile {
             padding: 1rem;
             background: linear-gradient(135deg, var(--primary-color), var(--purple-color));
@@ -158,7 +340,6 @@
             margin: 0;
         }
 
-        /* Navigation */
         .nav-section {
             flex: 1;
             padding: 1rem 0;
@@ -233,7 +414,6 @@
             color: white;
         }
 
-        /* Sidebar Toggle */
         .sidebar-toggle {
             position: fixed;
             top: 20px;
@@ -258,7 +438,6 @@
             color: white;
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -272,7 +451,6 @@
             margin-left: 70px;
         }
 
-        /* Top Navigation */
         .top-navbar {
             background: white;
             border-bottom: 1px solid var(--border-color);
@@ -308,7 +486,6 @@
             gap: 1rem;
         }
 
-        /* Search Bar */
         .search-box {
             position: relative;
         }
@@ -336,7 +513,6 @@
             color: var(--secondary-color);
         }
 
-        /* Notification Bell */
         .notification-bell {
             position: relative;
             background: none;
@@ -373,7 +549,6 @@
             100% { transform: scale(1); }
         }
 
-        /* User Dropdown */
         .user-dropdown {
             position: relative;
         }
@@ -396,7 +571,6 @@
             transform: translateY(-2px);
         }
 
-        /* Students Content */
         .students-container {
             flex: 1;
             padding: 2rem;
@@ -422,7 +596,6 @@
             margin: 0;
         }
 
-        /* Stats Cards */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -490,7 +663,6 @@
         .stat-change.positive { color: var(--success-color); }
         .stat-change.negative { color: var(--danger-color); }
 
-        /* Action Bar */
         .action-bar {
             display: flex;
             justify-content: space-between;
@@ -527,28 +699,6 @@
             gap: 10px;
         }
 
-        .btn {
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-        }
-
         .btn-outline {
             background: white;
             color: var(--secondary-color);
@@ -572,7 +722,6 @@
             width: 100%;
         }
 
-        /* Table */
         .table-container {
             background: white;
             border-radius: 12px;
@@ -620,26 +769,6 @@
             background: #f8fafc;
         }
 
-        .status-badge, .year-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-inactive { background: #fee2e2; color: #991b1b; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        .status-graduated { background: #e0e7ff; color: #3730a3; }
-
-        .year-1st { background: #dbeafe; color: #1e40af; }
-        .year-2nd { background: #d1fae5; color: #065f46; }
-        .year-3rd { background: #fef3c7; color: #92400e; }
-        .year-4th { background: #fce7f3; color: #be185d; }
-        .year-graduate { background: #f3f4f6; color: #374151; }
-
         .student-profile {
             display: flex;
             align-items: center;
@@ -682,16 +811,6 @@
             gap: 2px;
         }
 
-        .gpa-score {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .gpa-excellent { color: var(--success-color); }
-        .gpa-good { color: var(--primary-color); }
-        .gpa-average { color: var(--warning-color); }
-        .gpa-poor { color: var(--danger-color); }
-
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -715,6 +834,10 @@
 
         .action-btn:hover {
             transform: scale(1.1);
+        }
+
+        .d-none {
+            display: none;
         }
 
         /* Responsive */
@@ -803,7 +926,7 @@
     <div class="sidebar" id="sidebar">
       <!-- Logo Section -->
       <div class="logo-section">
-        <img src="/images/logochre.jpg" alt="CHRE Logo">
+        <img src="https://via.placeholder.com/60x60/4e73df/ffffff?text=CHRE" alt="CHRE Logo">
         <div class="system-title">CHRE Management System</div>
       </div>
 
@@ -812,12 +935,12 @@
         <div class="user-avatar">
           <i class='bx bx-user'></i>
         </div>
-        <div class="user-name"><?= esc(session()->get('full_name')) ?> </div>
-        <div class="user-role"><?= esc(session()->get('role')) ?></div>
+        <div class="user-name">Admin User</div>
+        <div class="user-role">Administrator</div>
       </div>
 
-            <!-- Navigation -->
-      <div class="nav-section">
+      <!-- Navigation -->
+            <div class="nav-section">
         <div class="nav-header">Main Menu</div>
         <nav>
           <div class="nav-item">
@@ -988,7 +1111,7 @@
                 <!-- Action Bar -->
                 <div class="action-bar">
                     <div class="search-box">
-                        <input type="text" placeholder="Search students...">
+                        <input type="text" placeholder="Search students..." id="studentSearch">
                         <i class='bx bx-search search-icon'></i>
                     </div>
                     <div class="filter-buttons">
@@ -1022,74 +1145,237 @@
                     </div>
                     <table>
                         <thead>
-            <tr>
-              <th>Full Name</th>
-              <th>Year</th>
-              <th>Contact</th>
-              <th>Department</th>
-              <th>Course</th>
-              <th>Date Registered</th>
-              <th>Actions</th>
-            </tr>
+                            <tr>
+                                <th class="d-none">ID</th>
+                                <th>Full Name</th>
+                                <th>Year</th>
+                                <th>Contact</th>
+                                <th>Department</th>
+                                <th>Course</th>
+                                <th>Date Registered</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
-                        <tbody id="studentsTableBody">
-    <?php if (!empty($students)): ?>
+<tbody id="studentsTableBody">
+      <?php if (!empty($students)): ?>
         <?php foreach ($students as $student): ?>
-            <tr>
-                <td>
-                    <div class="student-profile">
-                        <div class="student-avatar">
-                            <?php 
-                                $initials = strtoupper(substr($student['first_name'], 0, 1) . substr($student['last_name'], 0, 1));
-                                echo $initials;
-                            ?>
-                        </div>
-                        <div class="student-info">
-                            <div class="student-name">
-                                <?= esc($student['first_name'].' '.$student['mi'].'. '.$student['last_name']) ?>
-                            </div>
-                           
-                        </div>
-                    </div>
-                </td>
-                <td><span class="year-badge year-<?= strtolower($student['year']) ?>"><?= esc($student['year']) ?></span></td>
-                <td>
-                    <div class="contact-info">
-                        <span><?= esc($student['email']) ?></span>
-                        <span><?= esc($student['contact_number']) ?></span>
-                    </div>
-                </td>
-                <td><?= esc($student['department']) ?></td>
-                <td><?= esc($student['course']) ?></td>
-                
-                <td><?= date('M j, Y', strtotime($student['created_at'] ?? 'now')) ?></td>
-               
-                <td>
-                    <div class="action-buttons">
-                        <button class="action-btn view" onclick="viewStudent(<?= $student['id'] ?>)">
-                            <i class='bx bx-show'></i>
-                        </button>
-                        <button class="action-btn edit" onclick="editStudent(<?= $student['id'] ?>)">
-                            <i class='bx bx-edit'></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteStudent(<?= $student['id'] ?>)">
-                            <i class='bx bx-trash'></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
+          <tr>
+            <!-- hidden ID -->
+            <td class="student-id d-none"><?= esc($student['id']) ?></td>
+
+            <!-- Name -->
+            <td class="student-name">
+              <?= esc($student['first_name'].' '.$student['mi'].'. '.$student['last_name']) ?>
+            </td>
+
+            <!-- Year -->
+            <td class="student-year"><?= esc($student['year']) ?></td>
+
+            <!-- Contact -->
+            <td>
+              <div class="student-email d-none"><?= esc($student['email']) ?></div>
+              <div class="student-contact"><?= esc($student['contact_number']) ?></div>
+              <small><?= esc($student['email']) ?></small>
+            </td>
+
+            <!-- Department -->
+            <td class="student-dept"><?= esc($student['department']) ?></td>
+
+            <!-- Course -->
+            <td class="student-course"><?= esc($student['course']) ?></td>
+
+            <!-- Date Registered -->
+            <td><?= date('M j, Y', strtotime($student['created_at'] ?? 'now')) ?></td>
+
+            <!-- Actions -->
+<!-- Actions -->
+<td>
+  <div class="action-buttons">
+    <button class="action-btn view" data-id="<?= $student['id'] ?>"><i class='bx bx-show'></i></button>
+    <button class="action-btn edit" data-id="<?= $student['id'] ?>"><i class='bx bx-edit'></i></button>
+    <button class="action-btn delete" data-id="<?= $student['id'] ?>"><i class='bx bx-trash'></i></button>
+  </div>
+</td>
+
+          </tr>
         <?php endforeach; ?>
-    <?php else: ?>
+      <?php else: ?>
         <tr>
-            <td colspan="8" class="text-center text-muted">No students found.</td>
+          <td colspan="8" class="text-center text-muted">No students found.</td>
         </tr>
-    <?php endif; ?>
-</tbody>
-                    </table>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced View Student Modal -->
+    <div class="modal fade" id="viewStudentModal" tabindex="-1" aria-labelledby="viewStudentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewStudentLabel">
+                        <i class='bx bx-user-circle' style="margin-right: 10px;"></i>
+                        Student Information
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="student-detail-card">
+                        <div class="student-detail-item">
+                            <div class="detail-icon">
+                                <i class='bx bx-user'></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Full Name</div>
+                                <div class="detail-value" id="viewName">-</div>
+                            </div>
+                        </div>
+                        <div class="student-detail-item">
+                            <div class="detail-icon">
+                                <i class='bx bx-envelope'></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Email Address</div>
+                                <div class="detail-value" id="viewEmail">-</div>
+                            </div>
+                        </div>
+                        <div class="student-detail-item">
+                            <div class="detail-icon">
+                                <i class='bx bx-phone'></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Contact Number</div>
+                                <div class="detail-value" id="viewContact">-</div>
+                            </div>
+                        </div>
+                        <div class="student-detail-item">
+                            <div class="detail-icon">
+                                <i class='bx bx-buildings'></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Department</div>
+                                <div class="detail-value" id="viewDept">-</div>
+                            </div>
+                        </div>
+                        <div class="student-detail-item">
+                            <div class="detail-icon">
+                                <i class='bx bx-book'></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Course</div>
+                                <div class="detail-value" id="viewCourse">-</div>
+                            </div>
+                        </div>
+                        <div class="student-detail-item">
+                            <div class="detail-icon">
+                                <i class='bx bx-calendar'></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Year Level</div>
+                                <div class="detail-value" id="viewYear">-</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Enhanced Edit Student Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentLabel">
+                        <i class='bx bx-edit' style="margin-right: 10px;"></i>
+                        Edit Student Information
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm" method="post">
+                        <input type="hidden" name="id" id="editId">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-control" name="first_name" id="editFirstName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Middle Initial</label>
+                                    <input type="text" class="form-control" name="mi" id="editMI" maxlength="1">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" name="last_name" id="editLastName" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" name="email" id="editEmail" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Contact Number</label>
+                                    <input type="text" class="form-control" name="contact_number" id="editContact" placeholder="+63 912 345 6789">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Department</label>
+                                    <input type="text" class="form-control" name="department" id="editDept" placeholder="e.g., Computer Science">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label">Year Level</label>
+                                    <select class="form-control" name="year" id="editYear">
+                                        <option value="">Select Year Level</option>
+                                        <option value="1st Year">1st Year</option>
+                                        <option value="2nd Year">2nd Year</option>
+                                        <option value="3rd Year">3rd Year</option>
+                                        <option value="4th Year">4th Year</option>
+                                        <option value="Graduate">Graduate</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Course</label>
+                            <input type="text" class="form-control" name="course" id="editCourse" placeholder="e.g., BS Computer Science">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="editStudentForm" class="btn btn-primary">
+                        <i class='bx bx-save' style="margin-right: 5px;"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // Loading screen
@@ -1122,35 +1408,225 @@
         // Logout confirmation
         function confirmLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                // Add your logout logic here
                 console.log('Logging out...');
+                // Add your logout logic here
             }
         }
 
-        // Add click handlers for action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const action = this.classList.contains('view') ? 'View' : 
-                              this.classList.contains('edit') ? 'Edit' : 'Delete';
-                const row = this.closest('tr');
-                const studentName = row.querySelector('.student-name').textContent;
-                const studentId = row.querySelector('.student-id').textContent;
-                
-                if (action === 'Delete') {
-                    if (confirm(`Are you sure you want to delete ${studentName} (${studentId})?`)) {
-                        console.log(`${action} student: ${studentName}`);
+        // ======================
+        // Student Action Buttons - FIXED
+        // ======================
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize Bootstrap modals properly
+            const viewModalElement = document.getElementById("viewStudentModal");
+            const editModalElement = document.getElementById("editStudentModal");
+            
+            let viewModal, editModal;
+            
+            // Initialize modals only if Bootstrap is available
+            if (typeof bootstrap !== 'undefined') {
+                viewModal = new bootstrap.Modal(viewModalElement, {
+                    backdrop: 'static',
+                    keyboard: true
+                });
+                editModal = new bootstrap.Modal(editModalElement, {
+                    backdrop: 'static',
+                    keyboard: true
+                });
+            }
+
+            // VIEW button functionality
+            document.querySelectorAll(".action-btn.view").forEach(btn => {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const row = this.closest("tr");
+                    if (!row) return;
+
+                    // Extract data from the row
+                    const name = row.querySelector(".student-name")?.textContent?.trim() || '-';
+                    const email = row.querySelector(".student-email")?.textContent?.trim() || 
+                                  row.querySelector("small")?.textContent?.trim() || '-';
+                    const contact = row.querySelector(".student-contact")?.textContent?.trim() || '-';
+                    const dept = row.querySelector(".student-dept")?.textContent?.trim() || '-';
+                    const course = row.querySelector(".student-course")?.textContent?.trim() || '-';
+                    const year = row.querySelector(".student-year")?.textContent?.trim() || '-';
+
+                    // Populate modal with data
+                    document.getElementById("viewName").textContent = name;
+                    document.getElementById("viewEmail").textContent = email;
+                    document.getElementById("viewContact").textContent = contact;
+                    document.getElementById("viewDept").textContent = dept;
+                    document.getElementById("viewCourse").textContent = course;
+                    document.getElementById("viewYear").textContent = year;
+
+                    // Show modal
+                    if (viewModal) {
+                        viewModal.show();
+                    } else {
+                        viewModalElement.style.display = 'block';
+                        viewModalElement.classList.add('show');
                     }
+                });
+            });
+
+            // EDIT button functionality
+            document.querySelectorAll(".action-btn.edit").forEach(btn => {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const row = this.closest("tr");
+                    if (!row) return;
+
+                    // Extract data from the row
+                    const id = row.querySelector(".student-id")?.textContent?.trim() || '';
+                    const fullName = row.querySelector(".student-name")?.textContent?.trim() || '';
+                    const email = row.querySelector(".student-email")?.textContent?.trim() || 
+                                  row.querySelector("small")?.textContent?.trim() || '';
+                    const contact = row.querySelector(".student-contact")?.textContent?.trim() || '';
+                    const dept = row.querySelector(".student-dept")?.textContent?.trim() || '';
+                    const course = row.querySelector(".student-course")?.textContent?.trim() || '';
+                    const year = row.querySelector(".student-year")?.textContent?.trim() || '';
+
+                    // Parse full name
+                    const nameParts = fullName.split(' ');
+                    const firstName = nameParts[0] || '';
+                    const lastName = nameParts.slice(-1)[0] || '';
+                    const middleParts = nameParts.slice(1, -1);
+                    const middleInitial = middleParts.length > 0 ? middleParts[0].charAt(0) : '';
+
+                    // Populate form fields
+                    document.getElementById("editId").value = id;
+                    document.getElementById("editFirstName").value = firstName;
+                    document.getElementById("editMI").value = middleInitial;
+                    document.getElementById("editLastName").value = lastName;
+                    document.getElementById("editEmail").value = email;
+                    document.getElementById("editContact").value = contact;
+                    document.getElementById("editDept").value = dept;
+                    document.getElementById("editCourse").value = course;
+                    document.getElementById("editYear").value = year;
+
+                    // Show modal
+                    if (editModal) {
+                        editModal.show();
+                    } else {
+                        editModalElement.style.display = 'block';
+                        editModalElement.classList.add('show');
+                    }
+                });
+            });
+
+            // DELETE button functionality
+            document.querySelectorAll(".action-btn.delete").forEach(btn => {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const row = this.closest("tr");
+                    if (!row) return;
+                    
+                    const name = row.querySelector(".student-name")?.textContent?.trim() || 'this student';
+                    const id = row.querySelector(".student-id")?.textContent?.trim() || '';
+
+                    if (confirm(`Are you sure you want to delete ${name}?`)) {
+                        // Simulate deletion - replace with actual delete logic
+                        console.log(`Deleting student with ID: ${id}`);
+                        row.remove();
+                        
+                        // If you have a backend endpoint, use this:
+                        /*
+                        fetch(`/admin/students/delete/${id}`, {
+                            method: "POST",
+                            headers: { 
+                                "X-Requested-With": "XMLHttpRequest",
+                                "Content-Type": "application/json"
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                row.remove();
+                            } else {
+                                alert('Error deleting student');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Error deleting student');
+                        });
+                        */
+                    }
+                });
+            });
+
+            // Form submission for edit modal
+            document.getElementById('editStudentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const studentData = Object.fromEntries(formData.entries());
+                
+                console.log('Updating student:', studentData);
+                
+                // Simulate successful update
+                alert('Student information updated successfully!');
+                
+                // Close modal
+                if (editModal) {
+                    editModal.hide();
                 } else {
-                    console.log(`${action} student: ${studentName}`);
+                    editModalElement.style.display = 'none';
+                    editModalElement.classList.remove('show');
                 }
+                
+                // Refresh the page or update the table row
+                // location.reload(); // Uncomment this line if you want to refresh the page
+                
+                // If you have a backend endpoint, use this:
+                /*
+                fetch('/admin/students/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(studentData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Student updated successfully!');
+                        editModal.hide();
+                        location.reload();
+                    } else {
+                        alert('Error updating student: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating student');
+                });
+                */
+            });
+
+            // Close modal handlers for non-Bootstrap fallback
+            document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        modal.classList.remove('show');
+                    }
+                });
             });
         });
 
         // Search functionality
-        document.querySelector('.action-bar .search-box input').addEventListener('input', function(e) {
+        document.getElementById('studentSearch').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
+            const rows = document.querySelectorAll('#studentsTableBody tr');
             
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
@@ -1161,13 +1637,13 @@
         // Filter buttons functionality
         document.querySelectorAll('.filter-buttons .btn-outline').forEach(btn => {
             btn.addEventListener('click', function() {
-                // Add filter logic here
                 console.log('Filter clicked:', this.textContent.trim());
+                // Add your filter logic here
             });
         });
 
         // Export functionality
-        document.querySelector('.btn-primary')?.addEventListener('click', function() {
+        document.querySelector('.btn-primary[onclick]')?.addEventListener('click', function() {
             if (this.textContent.includes('Export')) {
                 console.log('Exporting student data...');
                 // Add export logic here

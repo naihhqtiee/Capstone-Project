@@ -126,11 +126,11 @@
     }
 
     .navbar {
-      background-color: #fff;
+      background-color: #fff; 
       border-bottom: 1px solid #e3e6f0;
-      padding: 0.75rem 1.5rem;
-      position: sticky;
-      top: 0;
+      padding: 0.75rem 1.5rem; 
+      position: sticky; 
+      top: 0; 
       z-index: 999;
     }
 
@@ -227,6 +227,57 @@
     .btn-edit { background: #007bff; color: white; }
     .btn-delete { background: #dc3545; color: white; }
 
+    /* Remarks input styling */
+    .remarks-input-container {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #dee2e6;
+    }
+
+    .remarks-textarea {
+      font-size: 12px;
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .file-input {
+      font-size: 12px;
+    }
+
+    .remarks-display {
+      font-size: 12px;
+      line-height: 1.4;
+      padding: 5px;
+      background: #e8f5e8;
+      border-radius: 3px;
+      border-left: 3px solid #28a745;
+    }
+
+    .attached-files {
+      margin-top: 5px;
+    }
+
+    .file-attachment {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 5px;
+      background: #f1f3f4;
+      border-radius: 3px;
+      margin-bottom: 2px;
+    }
+
+    .user-account {
+      font-size: 12px;
+      font-weight: 500;
+      color: #495057;
+      padding: 3px 6px;
+      background: #e3f2fd;
+      border-radius: 3px;
+      border-left: 3px solid #2196f3;
+    }
+
     /* Section headers */
     .section-header {
       background: #e3f2fd;
@@ -262,6 +313,7 @@
   </style>
 </head>
 <body>
+
 <!-- Sidebar Toggle Button -->
 <div class="sidebar-toggle" id="sidebarToggle">
   <i class='bx bx-menu'></i>
@@ -277,8 +329,8 @@
       <li class="text-center mb-3">
         <span style="font-weight: bold; font-size: 1.1rem;"><?= esc(session()->get('full_name')) ?></span>
       </li>
-      <li><a class="nav-link" href="dashboard"><i class='bx bx-grid-alt me-3'></i> Dashboard</a></li>
-      <li><a class="nav-link active" href="<?= base_url('staff/opcr-checklist') ?>"><i class='bx bx-task me-3'></i> OPCR Checklist</a></li>
+      <li><a class="nav-link active" href="dashboard"><i class='bx bx-grid-alt me-3'></i> Dashboard</a></li>
+      <li><a class="nav-link" href="<?= base_url('staff/opcr-checklist') ?>"><i class='bx bx-task me-3'></i> OPCR Checklist</a></li>
       <li class="dropdown">
         <a class="nav-link " href="<?= base_url('staff/complaints'); ?>" ><i class='bx bx-message-square-error me-3'></i> Complaints</a>
       </li>
@@ -295,11 +347,39 @@
     <nav class="navbar d-flex align-items-center">
       <form class="d-flex align-items-center me-auto">
         <input class="form-control me-2" type="search" placeholder="Q Search" style="width: 200px;">
-    </form>
+      </form>
       <div class="d-flex align-items-center" style="gap: 20px;">
         <span class="text-success fw-bold progress-clickable" id="completedPercent">90% Complete</span>
         <span class="text-danger fw-bold progress-clickable" id="incompletePercent">10% Not Completed</span>
         <button class="btn btn-outline-primary" onclick="downloadExcel()">Download Report</button>
+        <div class="d-flex align-items-center bg-primary px-3 py-2 rounded-pill text-white" style="gap: 1rem;">
+          <i class='bx bx-bell fs-4 position-relative'>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-count">0</span>
+          </i>
+          <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-2" style="width:40px; height:40px;">
+                <i class="bx bx-user text-dark fs-4"></i>
+              </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownUser">
+              <li class="px-3 py-2">
+                <div class="d-flex align-items-center">
+                  <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-2" style="width:50px; height:50px;">
+                    <i class="bx bx-user text-dark fs-3"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold"><?= esc(session()->get('full_name')) ?></div>
+                    <small class="text-muted"><?= esc(session()->get('email')) ?></small>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#"><i class="bx bx-cog me-2"></i> Account</a></li>
+              <li><a class="dropdown-item" href="<?= base_url('logout') ?>" onclick="return confirm('Are you sure you want to log out?')"><i class="bx bx-log-out me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -685,25 +765,194 @@ function downloadExcel() {
 
   // Initialize percentages on page load
   // updatePercentages(); // This line is now handled by the new updatePercentages function
+
+  // Search functionality
+  const searchInput = document.querySelector('input[type="search"]');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      const table = document.getElementById('opcrTable');
+      const rows = table.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  }
 </script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const actionHTML = `
-    <button type="button" class="action-btn btn-add" title="Add"><i class='bx bx-plus'></i></button>
-    <button type="button" class="action-btn btn-edit" title="Edit"><i class='bx bx-edit'></i></button>
-    <button type="button" class="action-btn btn-delete" title="Delete"><i class='bx bx-trash'></i></button>
+    <button type="button" class="action-btn btn-add" title="Add" onclick="showRemarksInput(this)">+</button>
+    <button type="button" class="action-btn btn-edit" title="Edit">✎</button>
+    <button type="button" class="action-btn btn-delete" title="Delete">🗑</button>
   `;
 
+  // Replace ALL action cells to ensure consistency
   document.querySelectorAll('#opcrTable tbody td.col-actions, #opcrTable2 tbody td.col-actions')
     .forEach(td => {
-      const raw = (td.textContent || '').trim();
-      if (!td.innerHTML.trim() || raw === '...') {
-        td.innerHTML = actionHTML;
+      console.log('Replacing action buttons in:', td); // Debug log
+      td.innerHTML = actionHTML;
+    });
+
+  // Don't auto-populate user account - only show when remarks are added
+
+  // Event delegation for Edit and Delete buttons
+  const tables = [document.getElementById('opcrTable'), document.getElementById('opcrTable2')].filter(Boolean);
+  tables.forEach(table => {
+    table.addEventListener('click', function(e) {
+      const target = e.target;
+      if (target.classList.contains('btn-edit')) {
+        editRemarks(target);
+      } else if (target.classList.contains('btn-delete')) {
+        deleteRemarks(target);
       }
     });
   });
+});
+
+function showRemarksInput(button) {
+  console.log('Plus button clicked!'); // Debug log
+  const row = button.closest('tr');
+  const remarksCell = row.querySelector('.col-remarks');
+  const accountableCell = row.querySelector('.col-accountable');
+  const statusCell = row.querySelector('.col-status');
+  
+  // Check if input already exists
+  if (remarksCell.querySelector('.remarks-input-container')) {
+    return;
+  }
+
+  // Create input container
+  const inputContainer = document.createElement('div');
+  inputContainer.className = 'remarks-input-container';
+  inputContainer.innerHTML = `
+    <div class="mb-2">
+      <textarea class="form-control remarks-textarea" placeholder="Enter remarks..." rows="3"></textarea>
+    </div>
+    <div class="mb-2">
+      <label class="form-label small">Attach File:</label>
+      <input type="file" class="form-control form-control-sm file-input" multiple>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-success btn-sm" onclick="saveRemarks(this)">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="cancelRemarks(this)">Cancel</button>
+    </div>
+  `;
+
+  remarksCell.innerHTML = '';
+  remarksCell.appendChild(inputContainer);
+  
+  // Focus on textarea
+  const textarea = inputContainer.querySelector('.remarks-textarea');
+  textarea.focus();
+}
+
+function saveRemarks(button) {
+  const container = button.closest('.remarks-input-container');
+  const textarea = container.querySelector('.remarks-textarea');
+  const fileInput = container.querySelector('.file-input');
+  const row = button.closest('tr');
+  const remarksCell = row.querySelector('.col-remarks');
+  const statusCell = row.querySelector('.col-status');
+  const accountableCell = row.querySelector('.col-accountable');
+  
+  const remarksText = textarea.value.trim();
+  const files = Array.from(fileInput.files);
+  
+  if (remarksText) {
+    // Create remarks display
+    let remarksHTML = `<div class="remarks-display">${remarksText}</div>`;
+    
+    // Add file attachments if any
+    if (files.length > 0) {
+      remarksHTML += '<div class="attached-files mt-2">';
+      files.forEach(file => {
+        remarksHTML += `<div class="file-attachment small text-muted">
+          <i class='bx bx-paperclip'></i> ${file.name}
+        </div>`;
+      });
+      remarksHTML += '</div>';
+    }
+    
+    remarksCell.innerHTML = remarksHTML;
+    
+    // Mark as done
+    statusCell.innerHTML = '<span class="status-badge status-done">Done</span>';
+    
+    // Add user account to accountable column only when remarks are saved
+    const userName = '<?= esc(session()->get("full_name")) ?>';
+    accountableCell.innerHTML = `<div class="user-account">${userName}</div>`;
+    
+    // Update percentages
+    updatePercentages();
+  } else {
+    alert('Please enter remarks before saving.');
+  }
+}
+
+function cancelRemarks(button) {
+  const container = button.closest('.remarks-input-container');
+  const row = button.closest('tr');
+  const remarksCell = row.querySelector('.col-remarks');
+  
+  remarksCell.innerHTML = '';
+}
+
+// Turn existing remarks into an editable input
+function editRemarks(button) {
+  const row = button.closest('tr');
+  const remarksCell = row.querySelector('.col-remarks');
+  const currentText = (remarksCell.textContent || '').trim();
+
+  // If already editing, do nothing
+  if (remarksCell.querySelector('.remarks-input-container')) return;
+
+  const inputContainer = document.createElement('div');
+  inputContainer.className = 'remarks-input-container';
+  inputContainer.innerHTML = `
+    <div class="mb-2">
+      <textarea class="form-control remarks-textarea" placeholder="Enter remarks..." rows="3"></textarea>
+    </div>
+    <div class="mb-2">
+      <label class="form-label small">Attach File:</label>
+      <input type="file" class="form-control form-control-sm file-input" multiple>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-success btn-sm" onclick="saveRemarks(this)">Save</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="cancelRemarks(this)">Cancel</button>
+    </div>
+  `;
+
+  remarksCell.innerHTML = '';
+  remarksCell.appendChild(inputContainer);
+  const textarea = inputContainer.querySelector('.remarks-textarea');
+  textarea.value = currentText;
+  textarea.focus();
+}
+
+// Clear remarks, status, and accountable for the row
+function deleteRemarks(button) {
+  if (!confirm('Clear remarks and reset status for this row?')) return;
+  const row = button.closest('tr');
+  const remarksCell = row.querySelector('.col-remarks');
+  const statusCell = row.querySelector('.col-status');
+  const accountableCell = row.querySelector('.col-accountable');
+
+  remarksCell.innerHTML = '';
+  statusCell.innerHTML = '';
+  accountableCell.innerHTML = '';
+  updatePercentages();
+}
+
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

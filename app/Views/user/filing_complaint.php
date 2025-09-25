@@ -989,7 +989,7 @@ $contact    = $passedUser['contact'] ?? session('contact') ?? '';
   <div class="alert alert-success mb-3 d-flex align-items-center justify-content-between">
     <div>
       <i class="bx bx-file me-2"></i>
-      Staff NDA is available.
+      NDA is available.
     </div>
     <div>
       <!-- View NDA -->
