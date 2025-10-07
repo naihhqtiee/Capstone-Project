@@ -7,6 +7,8 @@ use App\Models\AppointmentModel;
 use App\Models\StudentModel;
 use App\Models\EventModel;
 use App\Models\NdaModel;
+
+use Config\Database;
 class StaffController extends BaseController
 {
     public function dashboard()
@@ -15,6 +17,11 @@ class StaffController extends BaseController
         $complaintModel = new ComplaintModel();
         $data['total_complaints'] = $complaintModel->countAll();
         $data['pending_cases'] = $complaintModel->where('status', 'pending')->countAllResults();
+
+        $complaintModel->resetQuery();
+
+// Add resolved cases
+$data['resolved'] = $complaintModel->where('status', 'resolved')->countAllResults();
 
         // Complaints grouped by type
         $complaintCategory = $complaintModel->select('complaint_category, COUNT(*) as total')
@@ -45,6 +52,9 @@ class StaffController extends BaseController
             ->orderBy('appointment_date', 'ASC')
             ->findAll();
 
+             $studentModel = new StudentModel();
+    $data['totalStudents'] = $studentModel->countAll();
+
         return view('staff/dashboard', $data);
     }
 
@@ -71,7 +81,34 @@ public function complaints()
     ]);
 }
 
+public function updateComplaintStatus($id)
+{
+    $complaintModel = new \App\Models\ComplaintModel();
+    $notificationModel = new \App\Models\NotificationModel();
 
+    $status = $this->request->getPost('status');
+
+    // ✅ Update complaint status
+    $complaintModel->update($id, [
+        'status' => $status,
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+
+    // ✅ Find complaint to know who filed it
+    $complaint = $complaintModel->find($id);
+
+  if ($complaint && $complaint['user_id']) {
+    $notificationModel->insert([
+        'user_id'    => $complaint['user_id'],
+        'title'      => 'Complaint Status Updated',
+        'message'    => "Your complaint #{$complaint['id']} is now {$status}.",
+        'is_read'    => 0,
+        'created_at' => date('Y-m-d H:i:s')
+    ]);
+}
+
+    return redirect()->back()->with('success', 'Complaint status updated!');
+}
     public function storeIdentified()
     {
         $model = new ComplaintModel();
@@ -87,7 +124,6 @@ public function complaints()
                 }
             }
         }
-
         $complaintData = [
             'date'             => $this->request->getPost('date'),
             'location'         => $this->request->getPost('location'),
@@ -111,28 +147,59 @@ public function complaints()
 
   
 
-    public function appointments()
-    {
-        $model = new AppointmentModel();
-        $data['appointments'] = $model->orderBy('appointment_date', 'ASC')->findAll();
+public function appointments()
+{
+    $appointmentModel = new \App\Models\AppointmentModel();
+    $availableDateModel = new \App\Models\AvailableDateModel();
 
-        return view('staff/appointments', $data);
-    }
+    // Get appointments
+    $data['appointments'] = $appointmentModel
+        ->orderBy('appointment_date', 'ASC')
+        ->findAll();
 
-    public function updateStatus($id)
-    {
-        $model = new AppointmentModel();
+    // Get only upcoming available dates (unique)
+    $dates = $availableDateModel
+        ->where('date >=', date('Y-m-d'))
+        ->groupBy('date')
+        ->findAll();
 
-        $status = $this->request->getPost('status');
-        $reason = $this->request->getPost('rejection_reason');
+    $data['availableDates'] = array_map(fn($row) => $row['date'], $dates);
 
+    return view('staff/appointments', $data);
+}
+
+
+
+public function updateStatus($id)
+{
+    $model = new AppointmentModel();
+    $notificationModel = new \App\Models\NotificationModel();
+
+    $status = $this->request->getPost('status');
+    $reason = $this->request->getPost('rejection_reason');
+
+    $appointment = $model->find($id);
+
+    if ($appointment) {
         $model->update($id, [
             'status' => $status,
             'rejection_reason' => ($status === 'Rejected') ? $reason : null
         ]);
 
-        return redirect()->back()->with('message', 'Appointment status updated!');
+        // 🔔 Notify the user
+$notificationModel->insert([
+   'user_id'    => $student['account_id'],
+    'title'      => 'Appointment Status Updated',
+    'message'    => "Your appointment on {$appointment['appointment_date']} was {$status}.",
+    'is_read'    => 0,
+    'created_at' => date('Y-m-d H:i:s')
+]);
+
     }
+
+    return redirect()->back()->with('message', 'Appointment status updated!');
+}
+
 
     public function students()
     {
@@ -141,22 +208,57 @@ public function complaints()
         return view('staff/students', $data);
     }
 
-    public function getNotifications()
+ public function fetchNotifications()
     {
-        $complaintModel = new \App\Models\ComplaintModel();
-        $appointmentModel = new \App\Models\AppointmentModel();
-        $studentModel = new \App\Models\StudentModel();
+        $db = \Config\Database::connect();
 
-        $data = [
-            'complaints'   => $complaintModel->where('is_read', 0)->countAllResults(),
-            'appointments' => $appointmentModel->where('is_read', 0)->countAllResults(),
-            'students'     => $studentModel->where('created_at >=', date('Y-m-d 00:00:00'))->countAllResults(),
-        ];
+        $newUsers = $db->table('accounts')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'DESC')
+            ->limit(5)
+            ->get()
+            ->getResultArray();
 
-        $data['total'] = array_sum($data);
+        $newComplaints = $db->table('complaints')
+            ->orderBy('created_at', 'DESC')
+            ->limit(5)
+            ->get()
+            ->getResultArray();
 
-        return $this->response->setJSON($data);
+        $notifications = [];
+
+        foreach ($newUsers as $user) {
+            $notifications[] = [
+                'type' => 'user',
+                'title' => 'New user registered',
+                'description' => "{$user['full_name']} joined as {$user['role']}",
+                'time' => $this->timeAgo($user['created_at'])
+            ];
+        }
+
+        foreach ($newComplaints as $complaint) {
+            $notifications[] = [
+                'type' => 'complaint',
+                'title' => 'New complaint submitted',
+                'description' => "{$complaint['complaint_category']} - {$complaint['description']}",
+                'time' => $this->timeAgo($complaint['created_at'])
+            ];
+        }
+
+        return $this->response->setJSON($notifications);
     }
+
+    private function timeAgo($datetime)
+    {
+        $time = strtotime($datetime);
+        $diff = time() - $time;
+
+        if ($diff < 60) return $diff . " sec ago";
+        if ($diff < 3600) return floor($diff / 60) . " min ago";
+        if ($diff < 86400) return floor($diff / 3600) . " hour ago";
+        return floor($diff / 86400) . " day ago";
+    }
+
 
     public function eventRegistrants($eventId)
     {
@@ -304,10 +406,55 @@ public function deleteNda($id)
 
     return redirect()->back()->with('error', 'NDA not found.');
 }
+   public function addNote($complaintId)
+{
+    $note = $this->request->getPost('note');
 
+    if (!$note) {
+        return redirect()->back()->with('error', 'Note cannot be empty.');
+    }
 
+    $complaintModel = new ComplaintModel();
+    $complaintModel->update($complaintId, [
+        'notes'      => $note,
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
 
+    return redirect()->back()->with('success', 'Note saved successfully!');
+}
 
+    // Save the note
+  public function save_note($id)
+{
+    if (session()->get('role') !== 'staff') {
+        return redirect()->to('/')->with('error', 'Unauthorized access');
+    }
 
+    $note = $this->request->getPost('note');
+    if (!$note) {
+        return redirect()->back()->with('error', 'Note cannot be empty');
+    }
+
+    $complaintModel = new ComplaintModel();
+    $complaintModel->update($id, [
+        'notes'      => $note,
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+
+    // 🔔 Notify the complainant
+    $complaint = $complaintModel->find($id);
+    if ($complaint && $complaint['user_id']) {
+        $notificationModel = new \App\Models\NotificationModel();
+        $notificationModel->insert([
+            'user_id'    => $complaint['user_id'],
+            'title'      => 'Complaint Note Added',
+            'message'    => 'A staff member added a note to your complaint.',
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    return redirect()->to(base_url('complaint/view/' . $id))
+                     ->with('success', 'Note added successfully.');
+}
 
 }

@@ -12,6 +12,7 @@
       --primary-hover: #3756c0;
       --background-color: #f8f9fc;
       --text-color: #212529;
+       --sidebar-width: 260px;
     }
 
     body {
@@ -27,11 +28,10 @@
     }
 
     /* Sidebar */
-    .sidebar {
-      width: 260px;
-      background-color: #fff;
-      color: var(--text-color);
-      border-right: 1px solid #e3e6f0;
+     .sidebar {
+      width: var(--sidebar-width);
+      background: #fff;
+      border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -41,71 +41,153 @@
       overflow-y: auto;
       transition: transform 0.3s ease;
       z-index: 1000;
+      box-shadow: var(--shadow);
     }
 
     .sidebar.hide {
       transform: translateX(-100%);
     }
 
-    .sidebar ul {
-      list-style: none;
-      padding-left: 0;
+    .sidebar-header {
+      padding: 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-color);
       margin: 0;
     }
 
-    .sidebar a {
-      display: flex;
-      align-items: center;
-      padding: 14px 22px;
-      color: var(--text-color);
-      font-size: 1rem;
-      text-decoration: none;
-      transition: background 0.2s ease;
+    .sidebar-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 0;
     }
 
-    .sidebar a:hover,
-    .sidebar a.active {
-      background-color: var(--background-color);
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      margin: 0.25rem 0;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      color: var(--text-color);
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      position: relative;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      background-color: #f8f9fc;
+      color: var(--primary-color);
+      padding-left: 1.75rem;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+      color: white;
+      border-radius: 0 25px 25px 0;
+      margin-right: 1rem;
+      box-shadow: 0 2px 8px rgba(78, 115, 223, 0.3);
+    }
+
+    .nav-link.active:hover {
+      padding-left: 1.5rem;
+    }
+
+    .nav-link i {
+      width: 20px;
+      margin-right: 0.75rem;
+      text-align: center;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.7rem;
       font-weight: 600;
     }
 
-    .submenu {
-      display: none;
-      background-color: #f1f3f9;
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
     }
 
-    .dropdown.open .submenu {
-      display: block;
+    .logout-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .submenu li a {
-      font-size: 0.95rem;
-      padding: 10px 20px 10px 40px;
-      display: block;
+    .logout-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+      color: white;
     }
 
-    /* Sidebar toggle button */
+    /* Sidebar Toggle */
     .sidebar-toggle {
       position: fixed;
-      top: 15px;
-      left: 15px;
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
+      top: 1rem;
+      left: 1rem;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       z-index: 1100;
-      transition: background-color 0.2s ease;
+      transition: all 0.2s ease;
+      box-shadow: var(--card-shadow);
     }
 
     .sidebar-toggle:hover {
-      background-color: var(--background-color);
+      background: var(--primary-color);
+      color: white;
+      box-shadow: var(--hover-shadow);
     }
-
     /* Content */
     .content {
       flex-grow: 1;
@@ -170,24 +252,55 @@
 <div class="layout">
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
-    <ul class="nav flex-column">
-      <li class="text-center mb-2 mt-3">
-        <img src="/images/logochre.jpg" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
-      </li>
-      <li class="text-center mb-3">
-        <span style="font-weight: bold; font-size: 1.1rem;"><?= esc(session()->get('full_name')) ?></span>
-      </li>
-      <li><a class="nav-link " href="dashboard"><i class='bx bx-grid-alt me-3'></i> Dashboard</a></li>
-      <li><a class="nav-link" href="<?= base_url('staff/opcr-checklist') ?>"><i class='bx bx-task me-3'></i> OPCR Checklist</a></li>
-      <li class="dropdown">
-        <a class="nav-link " href="<?= base_url('staff/complaints'); ?>" ><i class='bx bx-message-square-error me-3'></i> Complaints</a>
-      </li>
-      <li><a class="nav-link" href="<?= base_url('staff/appointments') ?>"><i class='bx bx-calendar-check me-3'></i> Appointments</a></li>
-      <li><a class="nav-link" href="<?= base_url('staff/events') ?>"><i class='bx bx-calendar-event me-3'></i> Events</a></li>
-     <li><a class="nav-link active" href="<?= base_url('staff/students') ?>"><i class='bx bx-user-voice me-3'></i> Students</a></li>
-      <li><a class="nav-link" href="#"><i class='bx bx-id-card me-3'></i> CHRE Staff <span class="badge bg-primary ms-auto">1</span></a></li>
-    </ul>
-    <a href="<?= base_url('logout') ?>" class="btn btn-danger m-3"><i class='bx bx-log-out me-2'></i> Logout</a>
+    <div class="sidebar-header">
+       
+      <img src="/images/logochre.jpg" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+      
+      <div class="sidebar-title"><?= esc(session()->get('full_name')) ?></div>
+      <div class="sidebar-subtitle"><?= esc(session()->get('role')) ?></div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard">
+            <i class='bx bx-grid-alt'></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="opcr-checklist">
+            <i class='bx bx-task'></i>OPCR Checklist
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="complaints">
+            <i class='bx bx-message-square-error'></i>Complaints
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="appointments">
+            <i class='bx bx-calendar-check'></i>Appointments
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="events">
+            <i class='bx bx-calendar-event'></i>Events
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="students">
+            <i class='bx bx-user-voice'></i>Students
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="#" class="logout-btn" onclick="logout()">
+        <i class='bx bx-log-out me-2'></i>Logout
+      </a>
+    </div>
   </div>
 
   <!-- Content -->

@@ -24,7 +24,7 @@ class ComplaintModel extends Model
         'is_anonymous',
         'status',
         'is_read',
-        'admin_notes',
+        'notes',
         'created_at',
         'updated_at'
     ];

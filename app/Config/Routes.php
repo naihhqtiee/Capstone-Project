@@ -16,10 +16,24 @@ $routes->get('file-complaint', 'ComplaintController::complaintChoice');
 // ==================== 
 // Authentication Routes
 // ==================== 
+// ==================== 
+// Authentication Routes
+// ==================== 
 $routes->get('login', 'AuthController::index');
 $routes->post('login', 'AuthController::login'); // form action="/login"
 $routes->post('auth/login', 'AuthController::login'); // alternative form action="/auth/login"
 $routes->get('logout', 'AuthController::logout');
+
+// 🔹 Google OAuth
+$routes->get('google/login', 'GoogleAuth::login');
+$routes->get('google-callback', 'GoogleAuth::callback');
+
+$routes->get('forgot-password', 'AuthController::forgotPassword');
+$routes->post('forgot-password/send', 'AuthController::sendResetLink');
+$routes->get('reset-password/(:segment)', 'AuthController::resetPasswordForm/$1');
+$routes->post('reset-password', 'AuthController::resetPassword');
+
+
 
 // ==================== 
 // Registration Routes
@@ -51,21 +65,35 @@ $routes->post('staff/store-identified', 'StaffController::storeIdentified');
 // ==================== 
 // User Routes
 // ==================== 
-$routes->get('user/dashboard', 'User::userdashboard', ['filter' => 'auth']);
-$routes->match(['get', 'post'], 'user/filing-complaint', 'User::filing_complaint');
-$routes->get('user/appointment', 'User::appointment');
-$routes->get('user/view-complaint', 'User::viewComplaint');
-$routes->get('user/view-appointments', 'User::viewAppointments');
-$routes->get('user/userdashboard', 'User::userdashboard');
-$routes->post('user/register-event', 'User::registerEvent'); // ✅ Your register event route
-$routes->post('user/changePassword', 'User::changePassword');
-$routes->post('user/saveIdentified', 'User::saveIdentified');
-$routes->get('complaint/edit/(:num)', 'ComplaintController::edit/$1');
-$routes->post('complaint/update/(:num)', 'ComplaintController::update/$1');
-$routes->post('user/saveIdentified', 'User::saveIdentified');
+$routes->group('user', ['filter' => 'auth'], function($routes) {
+    $routes->get('dashboard', 'User::userdashboard');
+    $routes->match(['get', 'post'], 'filing-complaint', 'User::filing_complaint');
+    $routes->get('appointment', 'User::appointment');
+    $routes->get('view-complaint', 'User::viewComplaint');
+    $routes->get('view-appointments', 'User::viewAppointments');
+    $routes->get('userdashboard', 'User::userdashboard');
+    $routes->post('saveIdentified', 'User::saveIdentified');
+    $routes->post('register-event', 'User::registerEvent'); 
+    $routes->post('changePassword', 'User::changePassword');
+    $routes->get('notifications/fetch', 'User::fetchNotifications');
+$routes->post('notifications/read/(:num)', 'User::markNotificationAsRead/$1');
 
-// Appointment
-$routes->post('appointment/set', 'AppointmentController::set');
+});
+
+// Complaint routes
+$routes->group('complaint', ['filter' => 'auth'], function($routes) {
+    $routes->get('edit/(:num)', 'ComplaintController::edit/$1');
+    $routes->post('update/(:num)', 'ComplaintController::update/$1');
+});
+
+// Appointment routes
+$routes->group('appointment', ['filter' => 'auth'], function($routes) {
+    $routes->get('view/(:num)', 'User::viewAppointment/$1');
+    $routes->get('reschedule/(:num)', 'User::rescheduleAppointment/$1');
+    $routes->get('cancel/(:num)', 'User::cancelAppointment/$1');
+    $routes->get('download/(:num)', 'User::downloadAppointment/$1');
+    $routes->post('set', 'AppointmentController::set');
+});
 
 // ==================== 
 // Admin Panel Routes (Admin Only)
@@ -89,7 +117,17 @@ $routes->group('admin', function ($routes) {
     $routes->get('events', 'AdminController::events'); 
     $routes->get('students', 'AdminController::students'); 
     $routes->get('chre_staff', 'AdminController::chreStaff'); 
-    $routes->get('notifications', 'AdminController::fetchNotifications');
+// Routes
+; 
+$routes->post('chre_staff/add', 'AdminController::addChreStaff');
+$routes->post('chre_staff/add', 'AdminController::addChreStaff');
+
+$routes->get('chre_staff/edit/(:num)', 'AdminController::editChreStaff/$1');
+$routes->get('chre_staff/delete/(:num)', 'AdminController::deleteChreStaff/$1');
+$routes->get('chre_staff/view/(:num)', 'AdminController::viewChreStaff/$1');
+
+  $routes->get('notifications', 'AdminController::fetchNotifications');
+
     $routes->get('students/view/(:num)', 'AdminController::viewStudent/$1');
     $routes->get('students/edit/(:num)', 'AdminController::editStudent/$1');
     $routes->post('students/delete/(:num)', 'AdminController::deleteStudent/$1');
@@ -98,15 +136,25 @@ $routes->group('admin', function ($routes) {
      $routes->get('complaints/view/(:num)', 'ComplaintController::view/$1'); 
 $routes->post('complaints/delete/(:num)', 'AdminController::deleteComplaint/$1');
     $routes->match(['get','post'], 'complaints/edit/(:num)', 'AdminController::editComplaint/$1');
- 
+  // handle form submit
+
 
     // Events
-    $routes->get('events/view/(:num)', 'EventsController::view/$1');
-    $routes->get('events/edit/(:num)', 'EventsController::edit/$1');
-    $routes->post('events/update', 'EventsController::update');  
-    $routes->delete('events/delete/(:num)', 'EventsController::delete/$1');
+
 });
 
+// ==================== 
+// Events Routes (Shared by Admin & Staff)
+// ==================== 
+$routes->group('events', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'EventsController::index');          // List events
+    $routes->post('store', 'EventsController::store');     // Create event
+    $routes->get('view/(:num)', 'EventsController::view/$1');   // View JSON
+    $routes->get('edit/(:num)', 'EventsController::edit/$1');   // Edit form
+    $routes->post('update', 'EventsController::update');   // Update event
+    $routes->delete('delete/(:num)', 'EventsController::delete/$1'); // Delete event
+
+});
 
 
 
@@ -125,6 +173,12 @@ $routes->get('download-nda', 'StaffController::downloadNda');
 $routes->post('delete-nda/(:num)', 'StaffController::deleteNda/$1');
 $routes->get('view-nda/(:num)', 'StaffController::viewNda/$1');
 $routes->get('download-nda/(:num)', 'StaffController::downloadNda/$1');
+$routes->post('add_note/(:num)', 'StaffController::addNote/$1');
+$routes->get('notifications/fetch', 'StaffController::fetchNotifications');
+
+$routes->post('complaint/(:num)/save_note', 'StaffController::save_note/$1');
+$routes->get('events/registrants/(:num)', 'StaffController::eventRegistrants/$1');
+
 
 
 
@@ -181,17 +235,43 @@ $routes->get('student/completeProfile', 'StudentController::completeProfile');
 // ==================== 
 // Appointment Actions
 // ==================== 
-$routes->post('appointment/set', 'AppointmentController::set');
+// ====================
+// Appointment Routes
+// ====================
+$routes->post('appointments/set', 'AppointmentController::set');
+$routes->get('appointments/getAvailableSlots/(:any)', 'AppointmentController::getAvailableSlots/$1');
+$routes->get('appointments/getAvailableDates', 'AppointmentController::getAvailableDates');
+$routes->post('appointments/delete/(:num)', 'AppointmentController::delete/$1');
 
-// ==================== 
-// Staff Dashboard & Status Update (Outside Group)
-// ==================== 
+// ====================
+// Staff Dashboard & Status Update
+// ====================
 $routes->get('staff/dashboard', 'StaffController::dashboard');
 $routes->post('appointments/update-status/(:num)', 'StaffController::updateStatus/$1');
-$routes->get('appointment/slots/(:any)', 'AppointmentController::getAvailableSlots/$1');
-// Add this to your Routes.php file
-$routes->get('appointment/getAvailableSlots/(:segment)', 'AppointmentController::getAvailableSlots/$1');
-$routes->post('appointments/delete/(:num)', 'AppointmentController::delete/$1');
+
+
+
+// ==================== 
+// Appointment Routes (Availability & Booking)
+// ==================== 
+// Protected routes for staff/appointments
+$routes->group('appointment', ['filter' => 'auth'], function($routes) {
+    // Booking routes
+    $routes->post('set', 'AppointmentController::set'); 
+    $routes->get('slots/(:segment)', 'AppointmentController::getAvailableSlots/$1');
+    $routes->post('delete/(:num)', 'AppointmentController::delete/$1');
+
+    // Staff: manage availability
+    $routes->post('add-availability', 'AppointmentController::addAvailability');
+    $routes->post('remove-availability', 'AppointmentController::removeAvailability');
+    $routes->get('get-available-dates', 'AppointmentController::getAvailableDates');
+});
+
+// Public/User routes (not restricted by auth)
+$routes->get('appointment/getAvailableDates', 'User::getAvailableDates');
+$routes->get('appointment/getAvailableSlots/(:segment)', 'User::getAvailableSlots/$1');
+
+
 
 // ==================== 
 // Debug

@@ -1107,7 +1107,7 @@
                     <div class="user-dropdown">
                         <button class="user-dropdown-toggle">
                             <i class='bx bx-user'></i>
-                            <span>Admin User</span>
+                            <span><?= esc(session()->get('full_name')) ?></span>
                             <i class='bx bx-chevron-down'></i>
                         </button>
                     </div>
@@ -1199,11 +1199,67 @@
 <div class="table-container">
     <div class="table-header">
         <h3 class="table-title">All Events</h3>
-        <button class="btn btn-primary">
-            <i class='bx bx-plus'></i>
-            Create Event
+        <!-- ✅ Create Event Button -->
+        <button id="openCreateModal" class="btn btn-primary">
+            <i class='bx bx-plus'></i> Create Event
         </button>
     </div>
+
+    <!-- ✅ CREATE EVENT MODAL -->
+    <div id="createModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Create New Event</h2>
+          <button id="closeCreateModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="createEventForm">
+            <div class="form-group">
+              <label class="form-label">Event Name</label>
+              <input type="text" name="event_name" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-input form-textarea" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" name="location" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" name="start_date" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" name="end_date" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Audience</label>
+              <input type="text" name="audience" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Start Time</label>
+              <input type="time" name="start_time" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">End Time</label>
+              <input type="time" name="end_time" class="form-input">
+            </div>
+
+            <button type="submit" class="form-submit">Create Event</button>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
 
 <table>
     <thead>
@@ -1622,17 +1678,76 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // ✅ CREATE EVENT MODAL
+   // ✅ CREATE EVENT MODAL
+const openCreateBtn = document.getElementById("openCreateModal");
+const closeCreateBtn = document.getElementById("closeCreateModal");
+const createModal = document.getElementById("createModal");
+
+if (openCreateBtn && closeCreateBtn && createModal) {
+    openCreateBtn.addEventListener("click", () => openModal("createModal"));
+    closeCreateBtn.addEventListener("click", () => closeModal("createModal"));
+    createModal.addEventListener("click", (e) => {
+        if (e.target === createModal) closeModal("createModal");
+    });
+
+    // Handle form submit
+    document.getElementById("createEventForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector(".form-submit");
+        const originalText = submitBtn.textContent;
+
+        submitBtn.textContent = "Creating...";
+        submitBtn.disabled = true;
+
+        fetch(`/events/store`, {   // ✅ CHANGED URL
+            method: "POST",
+            body: formData
+        })
+        .then(res => {
+            if (res.redirected) {
+                // store() uses redirect, so handle it
+                window.location.href = res.url;
+                return;
+            }
+            return res.json();
+        })
+        .then(response => {
+            if (!response) return;
+            alert(response.message || "Event created successfully!");
+            if (response.success) {
+                closeModal("createModal");
+                location.reload();
+            }
+        })
+        .catch(err => {
+            console.error("Error creating event:", err);
+            alert("Failed to create event.");
+        })
+        .finally(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+
     // ESC key to close modals
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             const viewModal = document.getElementById('eventModal');
             const editModal = document.getElementById('editModal');
+            const createModal = document.getElementById('createModal');
             
-            if (viewModal.classList.contains('show')) {
+            if (viewModal?.classList.contains('show')) {
                 closeModal('eventModal');
             }
-            if (editModal.classList.contains('show')) {
+            if (editModal?.classList.contains('show')) {
                 closeModal('editModal');
+            }
+            if (createModal?.classList.contains('show')) {
+                closeModal('createModal');
             }
         }
     });

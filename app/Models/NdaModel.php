@@ -11,7 +11,7 @@ class NdaModel extends Model
 
     protected $allowedFields    = [
         'account_id',   // ✅ link to accounts table
-        'file_name',    // original file name
+       
         'file_path',    // stored file path
         'uploaded_at'   // timestamp
     ];

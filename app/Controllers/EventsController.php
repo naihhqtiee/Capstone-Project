@@ -17,6 +17,8 @@ class EventsController extends BaseController
  public function store()
 {
     $eventModel = new EventModel();
+    $notificationModel = new \App\Models\NotificationModel();
+    $studentModel = new \App\Models\StudentModel();
 
     $fileName = null;
     $file = $this->request->getFile('attachment');
@@ -39,8 +41,20 @@ class EventsController extends BaseController
         $end_time = $start_time;
     }
 
-    // ✅ Save date & time in their respective columns
-    $eventModel->save([
+    // 🚨 Check if there is already an event on this date
+    $existing = $eventModel->where('start_date', $start_date)->first();
+    if ($existing) {
+        session()->setFlashdata('error', "There is already an event scheduled on $start_date. Only one event per day is allowed.");
+
+        if (session()->get('role') === 'admin') {
+            return redirect()->to('admin/events')->withInput();
+        } else {
+            return redirect()->to('staff/events')->withInput();
+        }
+    }
+
+    // ✅ Save event
+    $eventData = [
         'event_name'  => $this->request->getPost('event_name'),
         'description' => $this->request->getPost('description'),
         'start_date'  => $start_date,
@@ -51,11 +65,31 @@ class EventsController extends BaseController
         'audience'    => $this->request->getPost('audience'),
         'file'        => $fileName,
         'status'      => 'active'
-    ]);
+    ];
 
-    session()->setFlashdata('success', 'Event has been successfully added!');
-    return redirect()->to('staff/events');
+    $eventModel->save($eventData);
+
+    // 🔔 Notify all students about the new event
+    $students = $studentModel->findAll();
+    foreach ($students as $student) {
+        $notificationModel->insert([
+            'user_id'    => $student['account_id'],
+            'title'      => 'New Event Added',
+            'message'    => "A new event '{$eventData['event_name']}' has been scheduled at {$eventData['location']}.",
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    session()->setFlashdata('success', 'Event has been successfully added and notifications sent!');
+
+    if (session()->get('role') === 'admin') {
+        return redirect()->to('admin/events');
+    } else {
+        return redirect()->to('staff/events');
+    }
 }
+
+
   public function view($id)
     {
         $eventModel = new EventModel();

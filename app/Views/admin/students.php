@@ -926,7 +926,7 @@
     <div class="sidebar" id="sidebar">
       <!-- Logo Section -->
       <div class="logo-section">
-        <img src="https://via.placeholder.com/60x60/4e73df/ffffff?text=CHRE" alt="CHRE Logo">
+        <img src="/images/logochre.jpg" alt="CHRE Logo">
         <div class="system-title">CHRE Management System</div>
       </div>
 
@@ -935,8 +935,8 @@
         <div class="user-avatar">
           <i class='bx bx-user'></i>
         </div>
-        <div class="user-name">Admin User</div>
-        <div class="user-role">Administrator</div>
+        <div class="user-name"><?= esc(session()->get('full_name')) ?> </div>
+        <div class="user-role"><?= esc(session()->get('role')) ?></div>
       </div>
 
       <!-- Navigation -->
@@ -1049,7 +1049,7 @@
                     <div class="user-dropdown">
                         <button class="user-dropdown-toggle">
                             <i class='bx bx-user'></i>
-                            <span>Admin User</span>
+                            <span><?= esc(session()->get('full_name')) ?></span>
                             <i class='bx bx-chevron-down'></i>
                         </button>
                     </div>

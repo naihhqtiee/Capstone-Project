@@ -19,9 +19,17 @@ public function userdashboard()
     $complaintModel    = new ComplaintModel();
     $eventRegModel     = new EventRegistrationModel();
 
-    $accountId = session()->get('account_id');   // session id from login
+    $accountId = session()->get('account_id');
     $email     = session()->get('email');
-    $current_user_role = session()->get('role') ?? 'guest'; // ✅ fallback to 'guest'
+    $current_user_role = session()->get('role') ?? 'guest';
+
+    // ✅ Get user's registered event IDs
+    $user_registrations = $eventRegModel
+        ->select('event_id')
+        ->where('user_id', $accountId)
+        ->findAll();
+    
+    $data['registered_event_ids'] = array_column($user_registrations, 'event_id');
 
     // Fetch counts
     $data['activeEvents']     = $eventModel->where('status', 'active')->countAllResults();
@@ -32,7 +40,7 @@ public function userdashboard()
     // Fetch events (still sorted by start date)
     $data['events'] = $eventModel->orderBy('start_date', 'DESC')->findAll();
 
-    // ✅ Pass the current user role to the view so it can filter audience
+    // Pass the current user role to the view
     $data['current_user_role'] = $current_user_role;
 
     return view('user/userdashboard', $data);
@@ -66,14 +74,15 @@ public function saveIdentified()
     ];
 
     // If filing with identity, include user information
-    if ($fileWithIdentity) {
-        $data['user_id'] = session('account_id');
-        $data['is_anonymous'] = 0;
-    } else {
-        // Filing anonymously - don't include user_id
-        $data['user_id'] = null;
-        $data['is_anonymous'] = 1;
-    }
+// Always store user_id for accountability
+$data['user_id'] = session('account_id');
+
+// Use flag only to control display
+if ($fileWithIdentity) {
+    $data['is_anonymous'] = 0;
+} else {
+    $data['is_anonymous'] = 1;
+}
 
     if ($complaintModel->insert($data)) {
         return redirect()->to('/user/view-complaint')
@@ -228,26 +237,59 @@ public function viewNda($filename)
         return view('user/appointment');
     }
 
+    public function getAvailableDates()
+{
+    $db = \Config\Database::connect();
+    $builder = $db->table('available_dates');
+    $builder->select('date');
+    $builder->orderBy('date', 'ASC');
+    $query = $builder->get();
+
+    $dates = [];
+    foreach ($query->getResult() as $row) {
+        $dates[] = date('Y-m-d', strtotime($row->date));
+    }
+
+    return $this->response->setJSON($dates);
+}
+
+public function getAvailableSlots($date)
+{
+    // You can make this dynamic later (fetch from DB)
+    $defaultSlots = [
+        '09:00',
+        '10:00',
+        '11:00',
+        '13:00',
+        '14:00',
+        '15:00'
+    ];
+
+    return $this->response->setJSON([
+        'available' => $defaultSlots
+    ]);
+}
+
+
 public function viewComplaint()
 {
     $complaintModel = new \App\Models\ComplaintModel();
+    $userId = session()->get('account_id');
 
-    $userId = session()->get('account_id');  // use consistent session key
-
+    // All complaints of this user
     $data['complaints'] = $complaintModel
         ->where('user_id', $userId)
         ->orderBy('date', 'DESC')
         ->findAll();
 
+    // ✅ Counts
+    $data['myComplaints']       = $complaintModel->where('user_id', $userId)->countAllResults();
+    $data['pendingComplaints']  = $complaintModel->where('user_id', $userId)->where('status', 'pending')->countAllResults();
+    $data['inProgressComplaints'] = $complaintModel->where('user_id', $userId)->where('status', 'in_progress')->countAllResults();
+    $data['resolvedComplaints'] = $complaintModel->where('user_id', $userId)->where('status', 'resolved')->countAllResults();
+
     return view('user/view_complaint', $data);
 }
-
-
-
-
-
-
-
     public function viewAppointments()
     {
         $appointmentModel = new \App\Models\AppointmentModel();
@@ -260,6 +302,69 @@ public function viewComplaint()
 
         return view('user/view_appointments', ['appointments' => $appointments]);
     }
+
+    public function rescheduleAppointment($id)
+{
+    $appointmentModel = new \App\Models\AppointmentModel();
+
+    $appointment = $appointmentModel->find($id);
+
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found.');
+    }
+
+    // ✅ Reset status back to Pending
+    $appointmentModel->update($id, ['status' => 'Pending']);
+
+    return redirect()->back()->with('success', 'Appointment rescheduled successfully.');
+}
+
+public function cancelAppointment($id)
+{
+    $appointmentModel = new \App\Models\AppointmentModel();
+
+    $appointment = $appointmentModel->find($id);
+
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found.');
+    }
+
+    // ✅ Update status
+    $appointmentModel->update($id, ['status' => 'Cancelled']);
+
+    return redirect()->back()->with('success', 'Appointment cancelled successfully.');
+}
+
+public function viewAppointment($id)
+{
+    $appointmentModel = new \App\Models\AppointmentModel();
+
+    $appointment = $appointmentModel->find($id);
+
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found.');
+    }
+
+    // ✅ Load a new view for details
+    return view('user/view_appointment_details', ['appointment' => $appointment]);
+}
+
+public function downloadAppointment($id)
+{
+    $appointmentModel = new \App\Models\AppointmentModel();
+
+    $appointment = $appointmentModel->find($id);
+
+    if (!$appointment) {
+        return redirect()->back()->with('error', 'Appointment not found.');
+    }
+
+    // ✅ Simple download as JSON (you can switch to PDF later)
+    return $this->response
+        ->setHeader('Content-Type', 'application/json')
+        ->setJSON($appointment);
+}
+
 
 public function registerEvent()
 {
@@ -366,6 +471,27 @@ public function registerEvent()
 
         return redirect()->back()->with('success', 'Password updated successfully');
     }
+public function fetchNotifications()
+{
+    $notificationModel = new \App\Models\NotificationModel();
+    $userId = session()->get('account_id');
+
+    $notifications = $notificationModel
+        ->where('user_id', $userId)
+        ->orderBy('created_at', 'DESC')
+        ->findAll();
+
+    return $this->response->setJSON($notifications);
+}
+
+
+public function markNotificationAsRead($id)
+{
+    $notificationModel = new \App\Models\NotificationModel();
+    $notificationModel->update($id, ['is_read' => 1]);
+
+    return $this->response->setJSON(['status' => 'success']);
+}
 
     /**
      * ✅ New method to fetch identified complaints with user info

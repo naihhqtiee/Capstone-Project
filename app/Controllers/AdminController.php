@@ -372,56 +372,119 @@ public function chreStaff()
         'totalUsers'    => $accountModel->countAllResults() // ✅ FIXED
     ]);
 }
+public function addChreStaff()
+{
+    $chreStaffModel = new \App\Models\ChreStaffModel();
 
+    if ($this->request->getMethod() === 'post') {
+        $data = [
+            'first_name'     => $this->request->getPost('first_name'),
+            'last_name'      => $this->request->getPost('last_name'),
+            'email'          => $this->request->getPost('email'),
+            'contact_number' => $this->request->getPost('contact_number'),
+            'department'     => $this->request->getPost('department'),
+            'position'       => $this->request->getPost('position'),
+            'status'         => $this->request->getPost('status'),
+        ];
 
-    public function fetchNotifications()
-    {
-        $db = \Config\Database::connect();
-
-        $newUsers = $db->table('accounts')
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'DESC')
-            ->limit(5)
-            ->get()
-            ->getResultArray();
-
-        $newComplaints = $db->table('complaints')
-            ->orderBy('created_at', 'DESC')
-            ->limit(5)
-            ->get()
-            ->getResultArray();
-
-        $notifications = [];
-
-        foreach ($newUsers as $user) {
-            $notifications[] = [
-                'type' => 'user',
-                'title' => 'New user registered',
-                'description' => "{$user['full_name']} joined as {$user['role']}",
-                'time' => $this->timeAgo($user['created_at'])
-            ];
+        if (!$chreStaffModel->insert($data)) {
+            // Show DB errors if insert fails
+            return redirect()->back()->with('error', implode(', ', $chreStaffModel->errors()));
         }
 
-        foreach ($newComplaints as $complaint) {
-            $notifications[] = [
-                'type' => 'complaint',
-                'title' => 'New complaint submitted',
-                'description' => "{$complaint['complaint_category']} - {$complaint['description']}",
-                'time' => $this->timeAgo($complaint['created_at'])
-            ];
+        return redirect()->to(base_url('admin/chre_staff'))->with('success', 'Staff member added successfully.');
+    }
+
+    return redirect()->to(base_url('admin/chre_staff'));
+}
+
+
+public function editChreStaff($id) {
+     $chreStaffModel = new \App\Models\ChreStaffModel(); 
+     $staff = $chreStaffModel->find($id);
+      if (!$staff) {
+         return redirect()->to('admin/chre-staff')->with('error', 'Staff not found.'); 
+        } 
+        if ($this->request->getMethod() === 'post') { 
+            $chreStaffModel->update($id, [ 
+                'first_name' => $this->request->getPost('first_name'), 
+                'last_name' => $this->request->getPost('last_name'), 
+                'email' => $this->request->getPost('email'), 
+                'contact_number' => $this->request->getPost('contact_number'), 
+                'department' => $this->request->getPost('department'), 
+                'position' => $this->request->getPost('position'), 
+                'status' => $this->request->getPost('status'), ]); 
+                return redirect()->to('admin/chre-staff')->with('success', 'Staff member updated successfully.'); 
+            } 
+            return view('admin/chre_staff/edit', ['staff' => $staff]); 
+        } 
+        public function deleteChreStaff($id) { 
+            $chreStaffModel = new \App\Models\ChreStaffModel(); 
+            if 
+            ($chreStaffModel->find($id)) { 
+                $chreStaffModel->delete($id);
+                return redirect()->to('admin/chre-staff')->with('success', 'Staff member deleted successfully.'); 
+            } 
+            return redirect()->to('admin/chre-staff')->with('error', 'Staff not found.'); 
         }
 
-        return $this->response->setJSON($notifications);
+        
+public function fetchNotifications()
+{
+    $db = \Config\Database::connect();
+
+    // ✅ Explicit select so we don’t get missing fields
+    $newUsers = $db->table('accounts')
+        ->select('id, full_name, role, created_at')
+        ->where('status', 'pending')
+        ->orderBy('created_at', 'DESC')
+        ->limit(5)
+        ->get()
+        ->getResultArray();
+
+    $newComplaints = $db->table('complaints')
+        ->select('id, complaint_category, description, created_at')
+        ->orderBy('created_at', 'DESC')
+        ->limit(5)
+        ->get()
+        ->getResultArray();
+
+    $notifications = [];
+
+    // ✅ Users
+    foreach ($newUsers as $user) {
+        $notifications[] = [
+            'type' => 'user',
+            'title' => 'New user registered',
+            'description' => ($user['full_name'] ?? 'Unknown') 
+                . ' joined as ' . ($user['role'] ?? 'N/A'),
+            'time' => $this->timeAgo($user['created_at'] ?? date('Y-m-d H:i:s'))
+        ];
     }
 
-    private function timeAgo($datetime)
-    {
-        $time = strtotime($datetime);
-        $diff = time() - $time;
-
-        if ($diff < 60) return $diff . " sec ago";
-        if ($diff < 3600) return floor($diff / 60) . " min ago";
-        if ($diff < 86400) return floor($diff / 3600) . " hour ago";
-        return floor($diff / 86400) . " day ago";
+    // ✅ Complaints
+    foreach ($newComplaints as $complaint) {
+        $notifications[] = [
+            'type' => 'complaint',
+            'title' => 'New complaint submitted',
+            'description' => ($complaint['complaint_category'] ?? 'General') 
+                . ' - ' . ($complaint['description'] ?? ''),
+            'time' => $this->timeAgo($complaint['created_at'] ?? date('Y-m-d H:i:s'))
+        ];
     }
+
+    return $this->response->setJSON($notifications);
+}
+
+private function timeAgo($datetime)
+{
+    $time = strtotime($datetime);
+    $diff = time() - $time;
+
+    if ($diff < 60) return $diff . " sec ago";
+    if ($diff < 3600) return floor($diff / 60) . " min ago";
+    if ($diff < 86400) return floor($diff / 3600) . " hour ago";
+    return floor($diff / 86400) . " day ago";
+}
+
 }

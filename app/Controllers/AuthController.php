@@ -94,6 +94,97 @@ $password = trim($this->request->getPost('password'));
         }
     }
 
+      public function forgotPassword()
+    {
+        return view('auth/forgot_password');
+    }
+
+    // Handle reset link request
+ public function sendResetLink()
+{
+    $email = trim($this->request->getPost('email'));
+    $accountModel = new AccountModel();
+    $user = $accountModel->where('email', $email)->first();
+
+    if (!$user) {
+        return redirect()->back()->with('error', 'Email not found.');
+    }
+
+    $token = bin2hex(random_bytes(50));
+
+    if (!$accountModel->update($user['id'], ['reset_token' => $token])) {
+        return redirect()->back()->with('error', 'Failed to generate reset token.');
+    }
+
+    $resetLink = base_url("reset-password/$token");
+
+    // PHPMailer
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'agonosmaybelle@gmail.com'; // your Gmail
+        $mail->Password   = 'mywueddhmuuawlmk'; // App Password
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        $mail->setFrom('agonosmaybelle@gmail.com', 'CSPC CHRE');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Password Reset Request';
+        $mail->Body    = '<p>Hello ' . $user['full_name'] . ',</p>
+                          <p>You requested a password reset. Click the link below:</p>
+                          <p><a href="' . $resetLink . '">Reset Password</a></p>
+                          <p>If you did not request this, ignore this email.</p>';
+
+        $mail->send();
+        return redirect()->to('/login')->with('success', 'Password reset link sent to your email.');
+
+    } catch (\PHPMailer\PHPMailer\Exception $e) {
+        log_message('error', 'Reset email failed: ' . $mail->ErrorInfo);
+        return redirect()->back()->with('error', 'Failed to send reset email: ' . $mail->ErrorInfo);
+    }
+}
+
+
+
+    // Reset Password form
+    public function resetPasswordForm($token)
+    {
+        $accountModel = new AccountModel();
+        $user = $accountModel->where('reset_token', $token)->first();
+
+        if (!$user) {
+            return redirect()->to('/login')->with('error', 'Invalid or expired reset link.');
+        }
+
+        return view('auth/reset_password', ['token' => $token]);
+    }
+
+    // Handle new password save
+    public function resetPassword()
+    {
+        $token = $this->request->getPost('token');
+        $password = $this->request->getPost('password');
+
+        $accountModel = new AccountModel();
+        $user = $accountModel->where('reset_token', $token)->first();
+
+        if (!$user) {
+            return redirect()->to('/login')->with('error', 'Invalid or expired token.');
+        }
+
+        $accountModel->update($user['id'], [
+            'password' => password_hash($password, PASSWORD_BCRYPT),
+            'reset_token' => null
+        ]);
+
+        return redirect()->to('/login')->with('success', 'Password updated successfully.');
+    }
+
     // Helper: Redirect by role
     private function redirectByRole($role)
     {

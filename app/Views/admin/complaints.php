@@ -886,7 +886,7 @@
                     <div class="user-dropdown">
                         <button class="user-dropdown-toggle">
                             <i class='bx bx-user'></i>
-                            <span>Admin User</span>
+                            <span><?= esc(session()->get('full_name')) ?></span>
                             <i class='bx bx-chevron-down'></i>
                         </button>
                     </div>
@@ -1055,10 +1055,7 @@
         </a>
 
         <!-- Edit -->
-        <a href="<?= base_url('admin/complaints/edit/'.$complaint['id']) ?>" 
-           class="action-btn edit" title="Edit">
-            <i class='bx bx-edit'></i>
-        </a>
+
 
         <!-- Delete (POST) -->
        <form action="<?= base_url('admin/complaints/delete/'.$complaint['id']) ?>" 

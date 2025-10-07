@@ -54,12 +54,21 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       --primary-hover: #3756c0;
       --background-color: #f8f9fc;
       --text-color: #212529;
+      --text-muted: #6c757d;
+      --border-color: #e3e6f0;
+      --shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+      --card-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+      --hover-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+      --sidebar-width: 260px;
       --success-color: #28a745;
       --warning-color: #ffc107;
       --danger-color: #dc3545;
       --info-color: #17a2b8;
       --light-gray: #f8f9fa;
-      --border-color: #e3e6f0;
+    }
+    
+    * {
+      box-sizing: border-box;
     }
     
     body { 
@@ -67,6 +76,7 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       background-color: var(--background-color); 
       margin: 0; 
       line-height: 1.6;
+      font-size: 14px;
     }
     
     .layout { 
@@ -75,215 +85,308 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       transition: margin-left 0.3s ease; 
     }
 
-    /* Sidebar - Keep original styling */
-    .sidebar { 
-      width: 260px; 
-      background-color: #fff; 
-      border-right: 1px solid #e3e6f0; 
-      display: flex; 
-      flex-direction: column; 
-      height: 100vh; 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      overflow-y: auto; 
+    /* Sidebar Styles - Exactly matching dashboard */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: #fff;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
       transition: transform 0.3s ease;
       z-index: 1000;
+      box-shadow: var(--shadow);
     }
-    .sidebar.hide { transform: translateX(-100%); }
 
-    /* Sidebar toggle button */
-    .sidebar-toggle { 
-      position: fixed; 
-      top: 15px; 
-      left: 15px; 
-      background-color: #fff; 
-      border: 1px solid #ddd; 
-      border-radius: 50%; 
-      width: 45px; 
-      height: 45px; 
+    .sidebar.hide { 
+      transform: translateX(-100%); 
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-color);
+      margin: 0;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+    }
+
+    .sidebar ul { 
+      list-style: none; 
+      padding: 0; 
+      margin: 0; 
+    }
+
+    .nav-item {
+      margin: 0.25rem 0;
+    }
+
+    .nav-link { 
       display: flex; 
       align-items: center; 
-      justify-content: center; 
-      cursor: pointer; 
-      z-index: 1100; 
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: left 0.3s ease;
+      padding: 0.75rem 1.5rem;
+      color: var(--text-color); 
+      font-size: 0.875rem; 
+      text-decoration: none; 
+      transition: all 0.2s ease;
+      position: relative;
+      font-weight: 500;
     }
-    .sidebar.hide + .sidebar-toggle {
-      left: 15px;
+
+    .nav-link:hover { 
+      background-color: #f8f9fc;
+      color: var(--primary-color);
+      padding-left: 1.75rem;
+    }
+
+    .nav-link.active { 
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+      color: white;
+      border-radius: 0 25px 25px 0;
+      margin-right: 1rem;
+      box-shadow: 0 2px 8px rgba(78, 115, 223, 0.3);
+    }
+
+    .nav-link.active:hover {
+      padding-left: 1.5rem;
+    }
+
+    .nav-link i {
+      width: 20px;
+      margin-right: 0.75rem;
+      text-align: center;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--primary-color);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .logout-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      border: none;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+      color: white;
+    }
+
+    /* Sidebar Toggle */
+    .sidebar-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1100;
+      transition: all 0.2s ease;
+      box-shadow: var(--card-shadow);
+    }
+
+    .sidebar-toggle:hover { 
+      background: var(--primary-color);
+      color: white;
+      box-shadow: var(--hover-shadow);
     }
 
     /* Content */
     .content { 
       flex-grow: 1; 
-      margin-left: 260px; 
+      margin-left: var(--sidebar-width); 
       padding: 2rem; 
       transition: margin-left 0.3s ease;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      background: #f5f5f5;
       min-height: 100vh;
     }
     .content.full { margin-left: 0; }
 
-    /* Sidebar links - Keep original */
-    .sidebar ul { list-style: none; padding: 0; margin: 0; }
-    .sidebar a { display: flex; align-items: center; padding: 14px 22px; color: var(--text-color); font-size: 1rem; text-decoration: none; transition: background 0.2s ease; }
-    .sidebar a:hover, .sidebar a.active { background-color: #eef1f8; font-weight: 600; }
-
-    /* Enhanced Header */
+    /* Simple Plain Header */
     .page-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 20px;
-      padding: 2rem;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 1.5rem;
       margin-bottom: 2rem;
-      color: white;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      color: #333;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
     }
 
     .page-header h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
+      font-size: 1.8rem;
+      font-weight: 600;
       margin-bottom: 0.5rem;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      color: #333;
     }
 
     .page-header p {
-      font-size: 1.1rem;
-      opacity: 0.9;
+      font-size: 1rem;
+      color: #666;
       margin-bottom: 0;
     }
 
-    /* Enhanced Stats Cards */
+    /* Simple Stats Cards */
     .stats-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
       margin-bottom: 2rem;
     }
 
     .stat-card {
       background: white;
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      border: none;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      transition: transform 0.2s ease;
     }
-
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--card-color);
-    }
-
-    .stat-card.total::before { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .stat-card.pending::before { background: linear-gradient(135deg, #f093fb, #f5576c); }
-    .stat-card.ongoing::before { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-    .stat-card.resolved::before { background: linear-gradient(135deg, #43e97b, #38f9d7); }
 
     .stat-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+      box-shadow: var(--hover-shadow);
     }
 
     .stat-card-content {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
     }
 
     .stat-card-info h3 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #2d3748;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #333;
     }
 
     .stat-card-info p {
-      font-size: 0.95rem;
-      color: #718096;
+      font-size: 0.9rem;
+      color: #666;
       margin: 0;
       font-weight: 500;
     }
 
-    .stat-card-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      color: white;
-    }
-
-    .stat-card.total .stat-card-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .stat-card.pending .stat-card-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
-    .stat-card.ongoing .stat-card-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-    .stat-card.resolved .stat-card-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-
-    /* Enhanced NDA Section */
+    /* Simple NDA Section */
     .nda-section {
       background: white;
-      border-radius: 20px;
-      padding: 2rem;
+      border: 1px solid #ddd;
+      padding: 1.5rem;
       margin-bottom: 2rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
     }
 
     .nda-header {
       display: flex;
       align-items: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #f7fafc;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
     }
 
     .nda-header h4 {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 600;
-      color: #2d3748;
+      color: #333;
       margin: 0;
     }
 
     /* Simple NDA Upload Area */
     .nda-upload-area {
       border: 2px dashed #ccc;
-      border-radius: 8px;
       padding: 2rem;
       text-align: center;
       background: #f9f9f9;
       margin-bottom: 1rem;
       cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s ease;
     }
 
     .nda-upload-area:hover {
-      border-color: #007bff;
-      background: #f0f8ff;
+      border-color: #999;
+      background: #f0f0f0;
     }
 
     .current-nda {
-      background: #e8f5e8;
-      border: 1px solid #c3e6c3;
-      border-radius: 8px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
       padding: 1rem;
       margin-top: 1rem;
+      border-radius: 8px;
     }
 
     /* Simple NDA File Items */
     .nda-file-item {
       background: #f8f9fa;
       border: 1px solid #e9ecef;
-      border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nda-file-item:hover {
+      box-shadow: var(--card-shadow);
     }
 
     .nda-file-item.active {
@@ -291,13 +394,13 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       border-color: #28a745;
     }
 
-    /* Simple Buttons - Plain and Clean */
+    /* Simple Buttons */
     .btn {
-      border-radius: 4px;
+      border-radius: 6px;
       font-weight: 500;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      border: 1px solid transparent;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      border: 1px solid;
       text-decoration: none;
       display: inline-block;
       cursor: pointer;
@@ -305,35 +408,29 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
     }
 
     .btn:hover {
-      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
     .btn-sm {
-      padding: 0.3rem 0.6rem;
+      padding: 0.25rem 0.5rem;
       font-size: 0.8rem;
     }
 
     .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
       color: white;
     }
 
     .btn-primary:hover {
-      background-color: #0056b3;
-      border-color: #0056b3;
-      color: white;
+      background-color: var(--primary-hover);
+      border-color: var(--primary-hover);
     }
 
     .btn-success {
       background-color: #28a745;
       border-color: #28a745;
-      color: white;
-    }
-
-    .btn-success:hover {
-      background-color: #218838;
-      border-color: #1e7e34;
       color: white;
     }
 
@@ -343,32 +440,20 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       color: white;
     }
 
-    .btn-info:hover {
-      background-color: #138496;
-      border-color: #117a8b;
-      color: white;
-    }
-
     .btn-danger {
       background-color: #dc3545;
       border-color: #dc3545;
       color: white;
     }
 
-    .btn-danger:hover {
-      background-color: #c82333;
-      border-color: #bd2130;
-      color: white;
-    }
-
     .btn-outline-primary {
-      border-color: #007bff;
-      color: #007bff;
+      border-color: var(--primary-color);
+      color: var(--primary-color);
       background: transparent;
     }
 
     .btn-outline-primary:hover {
-      background-color: #007bff;
+      background-color: var(--primary-color);
       color: white;
     }
 
@@ -378,153 +463,159 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       color: white;
     }
 
-    .btn-secondary:hover {
-      background-color: #5a6268;
-      border-color: #545b62;
-      color: white;
-    }
-
-    /* Enhanced Complaints Table */
+    /* Excel-Style Table Container */
     .complaints-section {
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      border: 1px solid #ddd;
       overflow: hidden;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
     }
 
+    /* Plain Header */
     .complaints-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 1.5rem 2rem;
+      background: #f8f9fa;
+      color: #333;
+      padding: 1rem 1.5rem;
       margin: 0;
+      border-bottom: 1px solid #ddd;
     }
 
     .complaints-header h4 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 600;
+      color: #333;
     }
 
     .table-container {
       overflow-x: auto;
     }
 
+    /* Excel-Style Table */
     .complaints-table {
       margin: 0;
-      border: none;
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.85rem;
+      background: white;
     }
 
     .complaints-table thead th {
-      background: #f8fafc;
-      border: none;
+      background: #f1f3f4;
+      border: 1px solid #d0d7de;
       font-weight: 600;
-      color: #4a5568;
-      padding: 1rem;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: #333;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+      text-align: left;
+      white-space: nowrap;
     }
 
     .complaints-table tbody tr {
-      border-bottom: 1px solid #e2e8f0;
-      transition: all 0.2s ease;
+      border: none;
+      background: white;
+    }
+
+    .complaints-table tbody tr:nth-child(even) {
+      background: #f9f9f9;
     }
 
     .complaints-table tbody tr:hover {
-      background-color: #f7fafc;
-      transform: scale(1.01);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      background-color: #e8f4fd;
     }
 
     .complaints-table td {
-      padding: 1.2rem 1rem;
-      vertical-align: middle;
-      border: none;
+      padding: 0.6rem 0.8rem;
+      vertical-align: top;
+      border: 1px solid #d0d7de;
+      font-size: 0.85rem;
+      line-height: 1.4;
     }
 
-    /* Enhanced Status Badges */
+    /* Simple Status Badges */
     .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      border-radius: 25px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      border-radius: 4px;
     }
 
     .status-pending { 
-      background: linear-gradient(135deg, #f093fb, #f5576c);
-      color: white;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
     }
     .status-ongoing { 
-      background: linear-gradient(135deg, #4facfe, #00f2fe);
-      color: white;
+      background: #cce5ff;
+      color: #004085;
+      border: 1px solid #99ccff;
     }
     .status-resolved { 
-      background: linear-gradient(135deg, #43e97b, #38f9d7);
-      color: white;
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #a3d977;
     }
 
-    /* Enhanced Alerts */
+    /* Simple Alerts */
     .alert {
-      border-radius: 15px;
-      border: none;
-      padding: 1.2rem 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid;
+      border-radius: 6px;
     }
 
     .alert-success {
-      background: linear-gradient(135deg, rgba(67, 233, 123, 0.1), rgba(56, 249, 215, 0.1));
-      border-left: 4px solid #43e97b;
-      color: #2f855a;
+      background: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
     }
 
     .alert-danger {
-      background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(245, 87, 108, 0.1));
-      border-left: 4px solid #f093fb;
-      color: #c53030;
+      background: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
     }
 
     .alert-warning {
       background: #fff3cd;
-      border-left: 4px solid #ffc107;
+      border-color: #ffeaa7;
       color: #856404;
     }
 
     /* Action Buttons Container */
     .action-buttons {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.3rem;
       flex-wrap: wrap;
     }
 
     /* Status Select Styling */
     .status-select {
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 0.5rem;
+      border: 1px solid #ced4da;
+      padding: 0.3rem;
       background: white;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
-      transition: all 0.3s ease;
-      min-width: 120px;
+      min-width: 100px;
+      border-radius: 4px;
     }
 
     .status-select:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+      box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.1);
     }
 
     /* Complaint Description Preview */
     .complaint-preview {
       max-width: 200px;
-      line-height: 1.4;
-      color: #4a5568;
+      line-height: 1.3;
+      color: #333;
+      font-size: 0.85rem;
     }
 
     /* User Info Styling */
@@ -534,54 +625,55 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
     }
 
     .user-name {
-      font-weight: 600;
-      color: #2d3748;
-      margin-bottom: 0.2rem;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 0.1rem;
+      font-size: 0.85rem;
     }
 
     .user-email {
-      font-size: 0.8rem;
-      color: #718096;
+      font-size: 0.75rem;
+      color: #666;
     }
 
     .anonymous-label {
       font-style: italic;
-      color: #a0aec0;
-      font-size: 0.9rem;
+      color: #999;
+      font-size: 0.85rem;
     }
 
     /* Filter and Search Bar */
     .filter-section {
       background: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      border: 1px solid #ddd;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
     }
 
     .search-input {
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
+      border: 1px solid #ced4da;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      border-radius: 6px;
     }
 
     .search-input:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+      box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.1);
     }
 
     /* Empty State */
     .empty-state {
       text-align: center;
       padding: 3rem;
-      color: #a0aec0;
+      color: #999;
     }
 
     .empty-state i {
-      font-size: 4rem;
+      font-size: 3rem;
       margin-bottom: 1rem;
       opacity: 0.5;
     }
@@ -589,20 +681,65 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
     /* File upload styling */
     .file-input {
       border: 1px solid #ced4da;
-      border-radius: 4px;
-      padding: 0.5rem;
-      font-size: 0.9rem;
+      padding: 0.4rem;
+      font-size: 0.85rem;
       width: 100%;
       margin-bottom: 1rem;
+      border-radius: 6px;
     }
 
     .selected-file {
-      background: #e8f5e8;
-      border: 1px solid #c3e6c3;
-      border-radius: 4px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
       padding: 0.5rem;
       margin-top: 0.5rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      border-radius: 6px;
+    }
+
+    /* Form controls */
+    .form-select, .form-control {
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+
+    .form-select:focus, .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.1);
+    }
+
+    /* Modal styling */
+    .modal-content {
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+      background: var(--primary-color);
+      color: white;
+      border-radius: 12px 12px 0 0;
+      border: none;
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) { 
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .content { 
+        margin-left: 0; 
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
     }
 
     @media (max-width: 768px) {
@@ -610,24 +747,28 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
         margin-left: 0; 
         padding: 1rem;
       }
-      .sidebar { 
-        transform: translateX(-100%); 
-      }
-      .sidebar.show { 
-        transform: translateX(0); 
-      }
       .nda-section, .page-header { 
-        padding: 1.5rem 1rem; 
+        padding: 1rem; 
       }
       .stats-container {
         grid-template-columns: 1fr;
         gap: 1rem;
       }
       .stat-card {
-        padding: 1.5rem;
+        padding: 1rem;
       }
       .action-buttons {
         flex-direction: column;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .table-responsive {
+        font-size: 0.8rem;
+      }
+      
+      .complaints-table td {
+        padding: 0.4rem;
       }
     }
   </style>
@@ -640,32 +781,64 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
 </div>
 
 <div class="layout">
-  <!-- Sidebar - Keep original structure -->
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
-    <ul class="nav flex-column">
-      <li class="text-center mb-2 mt-3">
-        <img src="/images/logochre.jpg" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
-      </li>
-      <li class="text-center mb-3">
-        <span style="font-weight: bold; font-size: 1.1rem;"><?= esc(session()->get('full_name')) ?></span>
-      </li>
-      <li><a class="nav-link" href="<?= base_url('staff/dashboard') ?>"><i class='bx bx-grid-alt me-3'></i> Dashboard</a></li>
-      <li><a class="nav-link" href="<?= base_url('staff/opcr-checklist') ?>"><i class='bx bx-task me-3'></i> OPCR Checklist</a></li>
-      <li><a class="nav-link active" href="<?= base_url('staff/complaints'); ?>"><i class='bx bx-message-square-error me-3'></i> Complaints</a></li>
-      <li><a class="nav-link" href="<?= base_url('staff/appointments') ?>"><i class='bx bx-calendar-check me-3'></i> Appointments</a></li>
-      <li><a class="nav-link" href="<?= base_url('staff/events') ?>"><i class='bx bx-calendar-event me-3'></i> Events</a></li>
-      <li><a class="nav-link" href="<?= base_url('staff/students') ?>"><i class='bx bx-user-voice me-3'></i> Students</a></li>
-      <li><a class="nav-link" href="#"><i class='bx bx-id-card me-3'></i> CHRE Staff <span class="badge bg-primary ms-auto">1</span></a></li>
-    </ul>
-    <a href="<?= base_url('logout') ?>" class="btn btn-danger m-3"><i class='bx bx-log-out me-2'></i> Logout</a>
-  </div>
+    <div class="sidebar-header">
+       
+      <img src="/images/logochre.jpg" alt="Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+      
+      <div class="sidebar-title"><?= esc(session()->get('full_name')) ?></div>
+      <div class="sidebar-subtitle"><?= esc(session()->get('role')) ?></div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <ul>
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard">
+            <i class='bx bx-grid-alt'></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="opcr-checklist">
+            <i class='bx bx-task'></i>OPCR Checklist
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="complaints">
+            <i class='bx bx-message-square-error'></i>Complaints
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="appointments">
+            <i class='bx bx-calendar-check'></i>Appointments
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="events">
+            <i class='bx bx-calendar-event'></i>Events
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="students">
+            <i class='bx bx-user-voice'></i>Students
+          </a>
+        </li>
 
+      </ul>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <a href="#" class="logout-btn" onclick="logout()">
+        <i class='bx bx-log-out me-2'></i>Logout
+      </a>
+    </div>
+  </div>
   <!-- Main Content -->
   <div class="content" id="content">
-    <!-- Enhanced Page Header -->
+    <!-- Simple Plain Header -->
     <div class="page-header">
-      <h1><i class='bx bx-message-square-error me-3'></i>Complaints Management Center</h1>
-      <p>Manage student complaints and NDA documentation with comprehensive oversight and tracking capabilities.</p>
+      <h1><i class='bx bx-message-square-error me-3'></i>Complaints</h1>
+      <p>Manage student complaints </p>
     </div>
 
     <!-- Flash Messages -->
@@ -685,16 +858,13 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       </div>
     <?php endif; ?>
 
-    <!-- Enhanced Stats Cards -->
+    <!-- Simple Stats Cards -->
     <div class="stats-container">
       <div class="stat-card total">
         <div class="stat-card-content">
           <div class="stat-card-info">
             <h3><?= esc($total) ?></h3>
             <p>Total Complaints</p>
-          </div>
-          <div class="stat-card-icon">
-            <i class='fas fa-clipboard-list'></i>
           </div>
         </div>
       </div>
@@ -705,9 +875,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
             <h3><?= esc($pending) ?></h3>
             <p>Pending Review</p>
           </div>
-          <div class="stat-card-icon">
-            <i class='fas fa-clock'></i>
-          </div>
         </div>
       </div>
       
@@ -717,9 +884,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
             <h3><?= esc($ongoing) ?></h3>
             <p>In Progress</p>
           </div>
-          <div class="stat-card-icon">
-            <i class='fas fa-spinner'></i>
-          </div>
         </div>
       </div>
       
@@ -728,9 +892,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
           <div class="stat-card-info">
             <h3><?= esc($resolved) ?></h3>
             <p>Resolved</p>
-          </div>
-          <div class="stat-card-icon">
-            <i class='fas fa-check-circle'></i>
           </div>
         </div>
       </div>
@@ -748,7 +909,7 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
         <?= csrf_field() ?>
         
         <div class="nda-upload-area" id="ndaUploadArea">
-          <i class='fas fa-cloud-upload-alt fa-3x text-muted mb-3'></i>
+          <i class='fas fa-cloud-upload-alt fa-2x text-muted mb-2'></i>
           <h5>Upload NDA Document</h5>
           <p class="text-muted">Click to select or drag and drop a PDF file (Max 5MB)</p>
           <input type="file" name="nda_file" id="ndaFile" accept=".pdf" class="file-input" style="display: none;">
@@ -769,7 +930,7 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
         <div class="current-nda">
           <div class="row align-items-center">
             <div class="col-md-8">
-              <h6 class="text-success mb-2"><i class='fas fa-check-circle me-2'></i>Current NDA File Active</h6>
+              <h6 class="text-success mb-2"><i class='fas fa-check-circle me-2'></i>Current NDA File </h6>
               <p class="mb-1"><strong><i class='fas fa-file-pdf me-2'></i>File:</strong> <?= esc(basename($activeNda['file_path'])) ?></p>
               <?php if (file_exists(FCPATH . $activeNda['file_path'])): ?>
                 <p class="mb-1"><strong><i class='fas fa-weight me-2'></i>Size:</strong> <?= number_format(filesize(FCPATH . $activeNda['file_path']) / 1024, 2) ?> KB</p>
@@ -792,8 +953,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
             </div>
           </div>
         </div>
-      <?php else: ?>
-
       <?php endif; ?>
 
       <!-- List of All NDA Files -->
@@ -820,9 +979,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
                   <a href="<?= base_url('staff/download-nda/' . $nda['id']) ?>" class="btn btn-info btn-sm">
                     <i class='fas fa-download me-1'></i> Download
                   </a>
-                  <?php if (!$activeNda || $activeNda['id'] !== $nda['id']): ?>
-
-                  <?php endif; ?>
                   <form action="<?= base_url('staff/delete-nda/' . $nda['id']) ?>" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this NDA file?');">
                     <?= csrf_field() ?>
                     <button class="btn btn-danger btn-sm">
@@ -869,152 +1025,163 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
       </div>
     </div>
 
-    <!-- Enhanced Complaints Table -->
-    <div class="complaints-section">
-      <div class="complaints-header">
-        <h4><i class='fas fa-list me-2'></i>Complaints Overview & Management</h4>
-      </div>
-      
-      <div class="table-container">
-        <table class="table complaints-table" id="complaintsTable">
-          <thead>
-            <tr>
-              <th width="5%">#</th>
-              <th width="12%">Category</th>
-              <th width="12%">Type</th>
-              <th width="25%">Description</th>
-              <th width="18%">Submitted By</th>
-              <th width="10%">Date</th>
-              <th width="12%">Status</th>
-              <th width="15%">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!empty($complaints)): ?>
-              <?php foreach ($complaints as $index => $c): ?>
-              <tr class="complaint-row" data-status="<?= esc($c['status']) ?>" data-category="<?= esc($c['complaint_category']) ?>" data-type="<?= esc($c['complaint_type']) ?>">
-                <td>
-                  <div class="fw-bold text-primary"><?= $index + 1 ?></div>
-                </td>
-                <td>
-                  <span class="badge bg-light text-dark border">
-                    <i class='fas fa-tag me-1'></i><?= esc($c['complaint_category']) ?>
-                  </span>
-                </td>
-                <td>
-                  <span class="badge bg-secondary">
-                    <i class='fas fa-folder me-1'></i><?= esc($c['complaint_type']) ?>
-                  </span>
-                </td>
-                <td>
-                  <div class="complaint-preview">
-                    <?= esc(word_limiter(strip_tags($c['description']), 15)) ?>
-                    <?php if (str_word_count(strip_tags($c['description'])) > 15): ?>
-                      <small class="text-primary" style="cursor: pointer;" onclick="showFullDescription('<?= esc(addslashes($c['description'])) ?>')">
-                        ...read more
-                      </small>
-                    <?php endif; ?>
-                  </div>
-                </td>
-                <td>
-                  <div class="user-info">
-                    <?php if (empty($c['is_anonymous']) || $c['is_anonymous'] == 0): ?>
-                      <div class="user-name">
-                        <i class='fas fa-user me-1'></i><?= esc($c['full_name'] ?? 'Unknown') ?>
-                      </div>
-                      <div class="user-email">
-                        <i class='fas fa-envelope me-1'></i><?= esc($c['email'] ?? 'No email') ?>
-                      </div>
-                      <?php if (!empty($c['contact_number'])): ?>
-                        <div class="user-email">
-                          <i class='fas fa-phone me-1'></i><?= esc($c['contact_number']) ?>
-                        </div>
-                      <?php endif; ?>
-                    <?php else: ?>
-                      <span class="anonymous-label">
-                        <i class='fas fa-user-secret me-1'></i>Anonymous User
-                      </span>
-                    <?php endif; ?>
-                  </div>
-                </td>
-                <td>
-                  <div class="text-center">
-                    <div class="fw-bold text-dark"><?= date('M d, Y', strtotime($c['date'])) ?></div>
-                    <small class="text-muted"><?= date('H:i A', strtotime($c['created_at'] ?? $c['date'])) ?></small>
-                  </div>
-                </td>
-                <td>
-                  <select class="form-select status-select complaint-status" data-id="<?= $c['id'] ?>">
-                    <option value="pending" <?= $c['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                    <option value="ongoing" <?= $c['status'] === 'ongoing' ? 'selected' : '' ?>>Ongoing</option>
-                    <option value="resolved" <?= $c['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
-                  </select>
-                  <div class="mt-1">
-                    <span class="status-badge status-<?= esc($c['status']) ?>">
-                      <?php if ($c['status'] === 'pending'): ?>
-                        <i class='fas fa-clock me-1'></i>Pending
-                      <?php elseif ($c['status'] === 'ongoing'): ?>
-                        <i class='fas fa-spinner me-1'></i>In Progress
-                      <?php else: ?>
-                        <i class='fas fa-check-circle me-1'></i>Resolved
-                      <?php endif; ?>
-                    </span>
-                  </div>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn btn-primary btn-sm" onclick="viewComplaintDetails(<?= $c['id'] ?>)" title="View Full Details">
-                      <i class='fas fa-eye'></i>
-                    </button>
-                    <a href="<?= base_url('complaint/view/' . $c['id']) ?>" target="_blank" 
-                       class="btn btn-info btn-sm" title="Open in New Tab">
-                      <i class='fas fa-external-link-alt'></i>
-                    </a>
-                    <form action="<?= base_url('complaint/delete/' . $c['id']) ?>" method="post" class="d-inline" onsubmit="return confirmDelete();">
+    <!-- Excel-Style Complaints Table -->
+<div class="complaints-section">
+  <div class="complaints-header">
+    <h4><i class='fas fa-list me-2'></i>Complaints Overview & Management</h4>
+  </div>
+  
+  <div class="table-container">
+    <table class="complaints-table" id="complaintsTable">
+      <thead>
+        <tr>
+          <th width="5%">#</th>
+          <th width="12%">Category</th>
+          <th width="12%">Type</th>
+          <th width="25%">Description</th>
+          <th width="18%">Submitted By</th>
+          <th width="10%">Date</th>
+          <th width="12%">Status</th>
+          <th width="15%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (!empty($complaints)): ?>
+          <?php foreach ($complaints as $index => $c): ?>
+          <tr class="complaint-row" 
+              data-status="<?= esc($c['status']) ?>" 
+              data-category="<?= esc($c['complaint_category']) ?>" 
+              data-type="<?= esc($c['complaint_type']) ?>">
+            <td><div class="fw-bold"><?= $index + 1 ?></div></td>
+            <td><?= esc($c['complaint_category']) ?></td>
+            <td><?= esc($c['complaint_type']) ?></td>
+            <td>
+              <div class="complaint-preview">
+                <?= esc(word_limiter(strip_tags($c['description']), 15)) ?>
+                <?php if (str_word_count(strip_tags($c['description'])) > 15): ?>
+                  <small class="text-primary" style="cursor: pointer;" 
+                         onclick="showFullDescription('<?= esc(addslashes($c['description'])) ?>')">
+                    ...read more
+                  </small>
+                <?php endif; ?>
+              </div>
+            </td>
+            <td>
+              <div class="user-info">
+                <?php if (empty($c['is_anonymous']) || $c['is_anonymous'] == 0): ?>
+                  <div class="user-name"><?= esc($c['full_name'] ?? 'Unknown') ?></div>
+                  <div class="user-email"><?= esc($c['email'] ?? 'No email') ?></div>
+                  <?php if (!empty($c['contact_number'])): ?>
+                    <div class="user-email"><?= esc($c['contact_number']) ?></div>
+                  <?php endif; ?>
+                <?php else: ?>
+                  <span class="anonymous-label">Anonymous User</span>
+                <?php endif; ?>
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <div class="fw-bold"><?= date('M d, Y', strtotime($c['date'])) ?></div>
+                <small class="text-muted"><?= date('H:i A', strtotime($c['created_at'] ?? $c['date'])) ?></small>
+              </div>
+            </td>
+            <td>
+              <select class="form-select status-select complaint-status" data-id="<?= $c['id'] ?>">
+                <option value="pending" <?= $c['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
+                <option value="ongoing" <?= $c['status'] === 'ongoing' ? 'selected' : '' ?>>Ongoing</option>
+                <option value="resolved" <?= $c['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
+              </select>
+              <div class="mt-1">
+                <span class="status-badge status-<?= esc($c['status']) ?>">
+                  <?php if ($c['status'] === 'pending'): ?>
+                    Pending
+                  <?php elseif ($c['status'] === 'ongoing'): ?>
+                    In Progress
+                  <?php else: ?>
+                    Resolved
+                  <?php endif; ?>
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="action-buttons">
+  <!-- View Complaint -->
+  <a href="<?= base_url('complaint/view/' . $c['id']) ?>" 
+     class="btn btn-primary btn-sm" title="View Complaint">
+    <i class='fas fa-eye'></i>
+  </a>
+
+  <!-- Add Note (opens modal) -->
+  <button type="button" 
+          class="btn btn-info btn-sm" 
+          data-bs-toggle="modal" 
+          data-bs-target="#addNoteModal<?= $c['id'] ?>" 
+          title="Add Note">
+    <i class='fas fa-sticky-note'></i>
+  </button>
+
+  <!-- Delete Complaint -->
+  <form action="<?= base_url('complaint/delete/' . $c['id']) ?>" 
+        method="post" class="d-inline" 
+        onsubmit="return confirmDelete();">
+    <?= csrf_field() ?>
+    <button class="btn btn-danger btn-sm" title="Delete Complaint">
+      <i class='fas fa-trash'></i>
+    </button>
+  </form>
+</div>
+
+
+              <!-- Add Note Modal -->
+              <div class="modal fade" id="addNoteModal<?= $c['id'] ?>" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="<?= base_url('staff/complaint/' . $c['id'] . '/save_note') ?>" method="post">
                       <?= csrf_field() ?>
-                      <button class="btn btn-danger btn-sm" title="Delete Complaint">
-                        <i class='fas fa-trash'></i>
-                      </button>
+                      <div class="modal-header">
+                        <h5 class="modal-title">Add Note for Complaint #<?= $c['id'] ?></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <label for="note<?= $c['id'] ?>" class="form-label">Note</label>
+                          <textarea name="note" id="note<?= $c['id'] ?>" 
+                                    class="form-control" rows="4" required><?= esc($c['notes']) ?></textarea>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Save Note</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                      </div>
                     </form>
                   </div>
-                </td>
-              </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr>
-                <td colspan="8" class="text-center">
-                  <div class="empty-state">
-                    <i class='fas fa-inbox'></i>
-                    <h5 class="mt-3 mb-2">No Complaints Found</h5>
-                    <p class="text-muted">There are currently no complaints in the system.</p>
-                  </div>
-                </td>
-              </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
+                </div>
+              </div>
+              <!-- End Add Note Modal -->
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr>
+            <td colspan="8" class="text-center">
+              <div class="empty-state">
+                <i class='fas fa-inbox'></i>
+                <h5 class="mt-3 mb-2">No Complaints Found</h5>
+                <p class="text-muted">There are currently no complaints in the system.</p>
+              </div>
+            </td>
+          </tr>
+        <?php endif; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+
   </div>
 </div>
 
 <!-- Complaint Details Modal -->
-<div class="modal fade" id="complaintModal" tabindex="-1">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="border-radius: 15px;">
-      <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
-        <h5 class="modal-title"><i class='fas fa-file-alt me-2'></i>Complaint Details</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="complaintModalBody">
-        <!-- Content will be loaded dynamically -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -1170,11 +1337,11 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
           
           let badgeContent = '';
           if (newStatus === 'pending') {
-            badgeContent = '<i class="fas fa-clock me-1"></i>Pending';
+            badgeContent = 'Pending';
           } else if (newStatus === 'ongoing') {
-            badgeContent = '<i class="fas fa-spinner me-1"></i>In Progress';
+            badgeContent = 'In Progress';
           } else {
-            badgeContent = '<i class="fas fa-check-circle me-1"></i>Resolved';
+            badgeContent = 'Resolved';
           }
           statusBadge.innerHTML = badgeContent;
           
@@ -1214,7 +1381,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
     setTimeout(() => {
       modalBody.innerHTML = `
         <div class="alert alert-info">
-          <i class='fas fa-info-circle me-2'></i>
           <strong>Note:</strong> This would show full complaint details including attachments, 
           conversation history, and detailed information.
         </div>
@@ -1230,8 +1396,8 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
     
     modalBody.innerHTML = `
       <div class="p-3">
-        <h6><i class='fas fa-align-left me-2'></i>Full Description</h6>
-        <div class="border rounded p-3 bg-light">
+        <h6>Full Description</h6>
+        <div class="border p-3 bg-light">
           ${description.replace(/\n/g, '<br>')}
         </div>
       </div>
@@ -1247,7 +1413,6 @@ $activeNda = $ndaModel->where('is_active', 1)->first();
     alertContainer.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     
     alertContainer.innerHTML = `
-      <i class='fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'} me-2'></i>
       ${message}
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;

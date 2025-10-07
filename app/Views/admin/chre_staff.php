@@ -998,7 +998,7 @@
                     <div class="user-dropdown">
                         <button class="user-dropdown-toggle">
                             <i class='bx bx-user'></i>
-                            <span>Admin User</span>
+                           <span><?= esc(session()->get('full_name')) ?></span>
                             <i class='bx bx-chevron-down'></i>
                         </button>
                     </div>
@@ -1080,518 +1080,352 @@
                 </div>
 
                 <!-- Staff Table -->
-                <div class="table-container">
-                    <div class="table-header">
-                        <h3 class="table-title">CHRE Staff Directory</h3>
-                        <button class="btn btn-primary" onclick="addStaffMember()">
-                            <i class='bx bx-user-plus'></i>Add Staff Member
-                        </button>
-                    </div>
-                    <table id="staffTable">
-                        <thead>
-                            <tr>
-                                <th>Staff Info</th>
-                                <th>Position</th>
-                                <th>Department</th>
-                                <th>Contact Information</th>
-                                <th>Experience</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="staffTableBody">
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">DR</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">Dr. Rachel Martinez</div>
-                                            <div class="staff-id">ID: CHRE-001</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Chief Medical Officer</div>
-                                    <div class="position-subtitle">Health Services Director</div>
-                                </td>
-                                <td><span class="department-badge dept-administration">Administration</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> dr.martinez@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 912 345 6789</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">12 years</span></td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-001')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-001')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-001')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">JT</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">James Thompson</div>
-                                            <div class="staff-id">ID: CHRE-002</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Senior Counselor</div>
-                                    <div class="position-subtitle">Mental Health Specialist</div>
-                                </td>
-                                <td><span class="department-badge dept-counseling">Counseling</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> j.thompson@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 918 765 4321</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">8 years</span></td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-002')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-002')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-002')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">ML</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">Maria Lopez</div>
-                                            <div class="staff-id">ID: CHRE-003</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Residence Hall Manager</div>
-                                    <div class="position-subtitle">Building A & B Supervisor</div>
-                                </td>
-                                <td><span class="department-badge dept-residence">Residence</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> m.lopez@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 917 234 5678</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">6 years</span></td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-003')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-003')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-003')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">RJ</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">Robert Johnson</div>
-                                            <div class="staff-id">ID: CHRE-004</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Student Affairs Coordinator</div>
-                                    <div class="position-subtitle">Activities & Programs</div>
-                                </td>
-                                <td><span class="department-badge dept-student-affairs">Student Affairs</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> r.johnson@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 919 876 5432</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">4 years</span></td>
-                                <td><span class="status-badge status-leave">On Leave</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-004')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-004')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-004')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">AB</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">Anna Brown</div>
-                                            <div class="staff-id">ID: CHRE-005</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Registered Nurse</div>
-                                    <div class="position-subtitle">Health Center Staff</div>
-                                </td>
-                                <td><span class="department-badge dept-administration">Administration</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> a.brown@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 916 345 6789</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">10 years</span></td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-005')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-005')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-005')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">CD</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">Carlos Davis</div>
-                                            <div class="staff-id">ID: CHRE-006</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Security Supervisor</div>
-                                    <div class="position-subtitle">Campus Safety & Security</div>
-                                </td>
-                                <td><span class="department-badge dept-security">Security</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> c.davis@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 915 678 9012</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">15 years</span></td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-006')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-006')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-006')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="staff-profile">
-                                        <div class="staff-avatar">EW</div>
-                                        <div class="staff-info">
-                                            <div class="staff-name">Emma Wilson</div>
-                                            <div class="staff-id">ID: CHRE-007</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="position-title">Maintenance Coordinator</div>
-                                    <div class="position-subtitle">Facilities & Environment</div>
-                                </td>
-                                <td><span class="department-badge dept-maintenance">Maintenance</span></td>
-                                <td>
-                                    <div class="contact-info">
-                                        <span><i class='bx bx-envelope'></i> e.wilson@chre.edu</span>
-                                        <span><i class='bx bx-phone'></i> +63 920 123 4567</span>
-                                    </div>
-                                </td>
-                                <td><span class="experience-years">7 years</span></td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view" onclick="viewStaff('CHRE-007')">
-                                            <i class='bx bx-show'></i>
-                                        </button>
-                                        <button class="action-btn edit" onclick="editStaff('CHRE-007')">
-                                            <i class='bx bx-edit'></i>
-                                        </button>
-                                        <button class="action-btn delete" onclick="deleteStaff('CHRE-007')">
-                                            <i class='bx bx-trash'></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+<div class="table-container">
+    <div class="table-header">
+        <h3 class="table-title">CHRE Staff Directory</h3>
+        <button class="btn btn-primary" onclick="addStaffMember()">
+            <i class='bx bx-user-plus'></i>Add Staff Member
+        </button>
+    </div>
+
+    <!-- ✅ Add Staff Modal -->
+  <form id="addStaffForm" action="<?= base_url('admin/chre_staff/add') ?>" method="post">
+
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" name="first_name" required>
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" name="last_name" required>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label>Contact Number</label>
+            <input type="text" name="contact_number">
+        </div>
+        <div class="form-group">
+            <label>Department</label>
+            <select name="department">
+                <option value="Administration">Administration</option>
+                <option value="Counseling">Counseling</option>
+                <option value="Residence">Residence</option>
+                <option value="Student Affairs">Student Affairs</option>
+                <option value="Security">Security</option>
+                <option value="Maintenance">Maintenance</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Position</label>
+            <input type="text" name="position">
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="Active">Active</option>
+                <option value="On Leave">On Leave</option>
+            </select>
+        </div>
+        <button type="submit" class="btn-submit">Save Staff</button>
+    </form>
+
+    <table id="staffTable">
+        <thead>
+            <tr>
+                <th>Staff Info</th>
+                <th>Position</th>
+                <th>Department</th>
+                <th>Contact Information</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="staffTableBody">
+            <?php if (!empty($staff)): ?>
+                <?php foreach ($staff as $s): ?>
+                    <?php
+                        $initials = strtoupper(substr($s['first_name'], 0, 1) . substr($s['last_name'], 0, 1));
+                        $fullName = $s['first_name'] . ' ' . $s['last_name'];
+                    ?>
+                    <tr>
+                        <td>
+                            <div class="staff-profile">
+                                <div class="staff-avatar"><?= esc($initials) ?></div>
+                                <div class="staff-info">
+                                    <div class="staff-name"><?= esc($fullName) ?></div>
+                                    <div class="staff-id">ID: CHRE-<?= esc($s['id']) ?></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><div class="position-title"><?= esc($s['position']) ?></div></td>
+                        <td><span class="department-badge"><?= esc($s['department']) ?></span></td>
+                        <td>
+                            <div class="contact-info">
+                                <span><i class='bx bx-envelope'></i> <?= esc($s['email']) ?></span>
+                                <span><i class='bx bx-phone'></i> <?= esc($s['contact_number']) ?></span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge <?= $s['status'] === 'Active' ? 'status-active' : 'status-leave' ?>">
+                                <?= esc($s['status']) ?>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn view" onclick="viewStaff('<?= $s['id'] ?>')"><i class='bx bx-show'></i></button>
+                                <button class="action-btn edit" onclick="editStaff('<?= $s['id'] ?>')"><i class='bx bx-edit'></i></button>
+                                <button class="action-btn delete" onclick="deleteStaff('<?= $s['id'] ?>')"><i class='bx bx-trash'></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="6">No staff members found</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+
+
             </div>
         </div>
     </div>
 
-    <script>
-        // Global variables
-        let staffMembers = [
-            {id: 'CHRE-001', name: 'Dr. Rachel Martinez', position: 'Chief Medical Officer', department: 'administration', email: 'dr.martinez@chre.edu', phone: '+63 912 345 6789', experience: '12 years', status: 'active'},
-            {id: 'CHRE-002', name: 'James Thompson', position: 'Senior Counselor', department: 'counseling', email: 'j.thompson@chre.edu', phone: '+63 918 765 4321', experience: '8 years', status: 'active'},
-            {id: 'CHRE-003', name: 'Maria Lopez', position: 'Residence Hall Manager', department: 'residence', email: 'm.lopez@chre.edu', phone: '+63 917 234 5678', experience: '6 years', status: 'active'},
-            {id: 'CHRE-004', name: 'Robert Johnson', position: 'Student Affairs Coordinator', department: 'student-affairs', email: 'r.johnson@chre.edu', phone: '+63 919 876 5432', experience: '4 years', status: 'leave'},
-            {id: 'CHRE-005', name: 'Anna Brown', position: 'Registered Nurse', department: 'administration', email: 'a.brown@chre.edu', phone: '+63 916 345 6789', experience: '10 years', status: 'active'},
-            {id: 'CHRE-006', name: 'Carlos Davis', position: 'Security Supervisor', department: 'security', email: 'c.davis@chre.edu', phone: '+63 915 678 9012', experience: '15 years', status: 'active'},
-            {id: 'CHRE-007', name: 'Emma Wilson', position: 'Maintenance Coordinator', department: 'maintenance', email: 'e.wilson@chre.edu', phone: '+63 920 123 4567', experience: '7 years', status: 'active'}
-        ];
+<script>
+    // Inject PHP staff data into JS
+    let staffMembers = <?= json_encode($staff) ?>;
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hide loading screen after a short delay
-            setTimeout(() => {
-                document.getElementById('loadingScreen').classList.remove('show');
-            }, 1000);
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            document.getElementById('loadingScreen').classList.remove('show');
+        }, 1000);
 
-            // Initialize event listeners
-            initializeEventListeners();
+        initializeEventListeners();
+        updateStaffTable();
+        updateStats();
+    });
+
+    function initializeEventListeners() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
         });
 
-        function initializeEventListeners() {
-            // Sidebar toggle
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
+        const searchInput = document.getElementById('staffSearch');
+        searchInput.addEventListener('input', function() {
+            filterStaff(this.value);
+        });
 
+        document.getElementById('notificationBell').addEventListener('click', () => {
+            showAlert('You have 5 new notifications!', 'success');
+        });
+
+        if (window.innerWidth <= 768) {
             sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
+                sidebar.classList.toggle('show');
             });
-
-            // Search functionality
-            const searchInput = document.getElementById('staffSearch');
-            searchInput.addEventListener('input', function() {
-                filterStaff(this.value);
-            });
-
-            // Notification bell click
-            document.getElementById('notificationBell').addEventListener('click', () => {
-                showAlert('You have 5 new notifications!', 'success');
-            });
-
-            // Mobile sidebar toggle
-            if (window.innerWidth <= 768) {
-                sidebarToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('show');
-                });
-            }
         }
+    }
 
-        // Staff management functions
-        function viewStaff(staffId) {
-            const staff = staffMembers.find(s => s.id === staffId);
-            if (staff) {
-                showAlert(`Viewing details for ${staff.name} (${staff.id})`, 'success');
-            }
+    // Staff management functions
+    function viewStaff(staffId) {
+        window.location.href = `/admin/chre-staff/view/${staffId}`;
+    }
+
+    function editStaff(staffId) {
+        window.location.href = `/admin/chre-staff/edit/${staffId}`;
+    }
+
+    function deleteStaff(staffId) {
+        if (confirm(`Are you sure you want to delete staff ID: ${staffId}?`)) {
+            window.location.href = `/admin/chre-staff/delete/${staffId}`;
         }
+    }
 
-        function editStaff(staffId) {
-            const staff = staffMembers.find(s => s.id === staffId);
-            if (staff) {
-                showAlert(`Editing ${staff.name} (${staff.id})`, 'success');
-            }
+    // ✅ Modal functions
+    function addStaffMember() {
+        document.getElementById('addStaffModal').style.display = 'block';
+    }
+
+    function closeAddStaffModal() {
+        document.getElementById('addStaffModal').style.display = 'none';
+    }
+
+   
+
+    // Close modal if clicked outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('addStaffModal');
+        if (event.target === modal) {
+            modal.style.display = "none";
         }
+    };
 
-        function deleteStaff(staffId) {
-            const staff = staffMembers.find(s => s.id === staffId);
-            if (staff && confirm(`Are you sure you want to delete ${staff.name} (${staff.id})?`)) {
-                const index = staffMembers.findIndex(s => s.id === staffId);
-                if (index > -1) {
-                    staffMembers.splice(index, 1);
-                    updateStaffTable();
-                    updateStats();
-                    showAlert(`${staff.name} has been deleted successfully!`, 'success');
-                }
-            }
-        }
+    function updateStaffTable() {
+        const tbody = document.getElementById('staffTableBody');
+        tbody.innerHTML = '';
 
-        function addStaffMember() {
-            const newStaffId = `CHRE-${String(staffMembers.length + 1).padStart(3, '0')}`;
-            const newStaff = {
-                id: newStaffId,
-                name: 'New Staff Member',
-                position: 'Position Title',
-                department: 'administration',
-                email: 'new.staff@chre.edu',
-                phone: '+63 900 000 0000',
-                experience: '1 year',
-                status: 'active'
-            };
-            
-            staffMembers.push(newStaff);
-            updateStaffTable();
-            updateStats();
-            showAlert(`New staff member ${newStaffId} added successfully!`, 'success');
-        }
-
-        function updateStaffTable() {
-            const tbody = document.getElementById('staffTableBody');
-            tbody.innerHTML = '';
-
-            staffMembers.forEach(staff => {
-                const initials = getInitials(staff.name);
-                const row = `
-                    <tr>
-                        <td>
-                            <div class="staff-profile">
-                                <div class="staff-avatar">${initials}</div>
-                                <div class="staff-info">
-                                    <div class="staff-name">${staff.name}</div>
-                                    <div class="staff-id">ID: ${staff.id}</div>
-                                </div>
+        staffMembers.forEach(staff => {
+            const initials = getInitials(staff.first_name + " " + staff.last_name);
+            const row = `
+                <tr>
+                    <td>
+                        <div class="staff-profile">
+                            <div class="staff-avatar">${initials}</div>
+                            <div class="staff-info">
+                                <div class="staff-name">${staff.first_name} ${staff.last_name}</div>
+                                <div class="staff-id">ID: ${staff.id}</div>
                             </div>
-                        </td>
-                        <td>
-                            <div class="position-title">${staff.position}</div>
-                            <div class="position-subtitle">Department Staff</div>
-                        </td>
-                        <td><span class="department-badge dept-${staff.department}">${staff.department.charAt(0).toUpperCase() + staff.department.slice(1).replace('-', ' ')}</span></td>
-                        <td>
-                            <div class="contact-info">
-                                <span><i class='bx bx-envelope'></i> ${staff.email}</span>
-                                <span><i class='bx bx-phone'></i> ${staff.phone}</span>
-                            </div>
-                        </td>
-                        <td><span class="experience-years">${staff.experience}</span></td>
-                        <td><span class="status-badge status-${staff.status}">${staff.status.charAt(0).toUpperCase() + staff.status.slice(1)}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn view" onclick="viewStaff('${staff.id}')">
-                                    <i class='bx bx-show'></i>
-                                </button>
-                                <button class="action-btn edit" onclick="editStaff('${staff.id}')">
-                                    <i class='bx bx-edit'></i>
-                                </button>
-                                <button class="action-btn delete" onclick="deleteStaff('${staff.id}')">
-                                    <i class='bx bx-trash'></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-        }
-
-        function getInitials(name) {
-            return name.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
-        }
-
-        function updateStats() {
-            const activeStaff = staffMembers.filter(s => s.status === 'active').length;
-            const onLeave = staffMembers.filter(s => s.status === 'leave').length;
-            const departments = [...new Set(staffMembers.map(s => s.department))].length;
-            
-            // Update stat cards
-            const statCards = document.querySelectorAll('.stat-card');
-            statCards[0].querySelector('.stat-number').textContent = activeStaff;
-            statCards[1].querySelector('.stat-number').textContent = departments;
-            statCards[3].querySelector('.stat-number').textContent = onLeave;
-        }
-
-        function filterStaff(searchTerm) {
-            const tableRows = document.querySelectorAll('#staffTableBody tr');
-            const term = searchTerm.toLowerCase();
-            
-            tableRows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(term)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        function filterByStatus(status) {
-            showAlert(`Filtering by status: ${status}`, 'success');
-        }
-
-        function filterByDepartment(dept) {
-            showAlert(`Filtering by department: ${dept}`, 'success');
-        }
-
-        function filterByExperience(exp) {
-            showAlert(`Filtering by experience: ${exp}`, 'success');
-        }
-
-        function exportData() {
-            showAlert('Exporting staff data...', 'success');
-        }
-
-        // Utility functions
-        function showAlert(message, type = 'success') {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            document.body.appendChild(alert);
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 300);
-            }, 5000);
-        }
-
-        function confirmLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                showAlert('Logging out...', 'success');
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 1500);
-            }
-        }
-
-        // Responsive handling
-        window.addEventListener('resize', function() {
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth > 768) {
-                sidebar.classList.remove('show');
-            }
+                        </div>
+                    </td>
+                    <td>
+                        <div class="position-title">${staff.position}</div>
+                        <div class="position-subtitle">Department Staff</div>
+                    </td>
+                    <td><span class="department-badge dept-${staff.department}">${capitalize(staff.department)}</span></td>
+                    <td>
+                        <div class="contact-info">
+                            <span><i class='bx bx-envelope'></i> ${staff.email}</span>
+                            <span><i class='bx bx-phone'></i> ${staff.contact_number}</span>
+                        </div>
+                    </td>
+                    <td><span class="experience-years">${staff.experience || "N/A"}</span></td>
+                    <td><span class="status-badge status-${staff.status}">${capitalize(staff.status)}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn view" onclick="viewStaff('${staff.id}')">
+                                <i class='bx bx-show'></i>
+                            </button>
+                            <button class="action-btn edit" onclick="editStaff('${staff.id}')">
+                                <i class='bx bx-edit'></i>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteStaff('${staff.id}')">
+                                <i class='bx bx-trash'></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
         });
-    </script>
+    }
+
+    function getInitials(name) {
+        return name.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
+    }
+
+    function capitalize(text) {
+        return text ? text.charAt(0).toUpperCase() + text.slice(1).replace('-', ' ') : '';
+    }
+
+    function updateStats() {
+        const activeStaff = staffMembers.filter(s => s.status === 'active').length;
+        const onLeave = staffMembers.filter(s => s.status === 'leave').length;
+        const departments = [...new Set(staffMembers.map(s => s.department))].length;
+
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards[0].querySelector('.stat-number').textContent = activeStaff;
+        statCards[1].querySelector('.stat-number').textContent = departments;
+        statCards[3].querySelector('.stat-number').textContent = onLeave;
+    }
+
+    function filterStaff(searchTerm) {
+        const tableRows = document.querySelectorAll('#staffTableBody tr');
+        const term = searchTerm.toLowerCase();
+
+        tableRows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(term) ? '' : 'none';
+        });
+    }
+
+    function showAlert(message, type = 'success') {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.textContent = message;
+
+        document.body.appendChild(alert);
+
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        }, 5000);
+    }
+
+    function confirmLogout() {
+        if (confirm('Are you sure you want to logout?')) {
+            showAlert('Logging out...', 'success');
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
+        }
+    }
+
+    window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('show');
+        }
+    });
+</script>
+
+<style>
+/* ✅ Modal Styling */
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  overflow-y: auto; /* <-- allow scroll when content is large */
+}
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  max-height: 90vh; /* <-- limit modal height to viewport */
+  overflow-y: auto; /* <-- scroll inside modal */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+}
+.modal-content h2 { margin-bottom: 15px; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+.form-group input, .form-group select {
+  width: 100%; padding: 8px;
+  border-radius: 6px; border: 1px solid #ccc;
+}
+.close {
+  float: right; font-size: 22px; cursor: pointer;
+}
+.form-actions {
+  margin-top: 15px;
+  text-align: right;
+  position: sticky;
+  bottom: 0; /* <-- keeps button visible */
+  background: #fff;
+  padding-top: 10px;
+}
+.btn-submit {
+  background: #28a745; color: white;
+  border: none; padding: 10px 14px;
+  border-radius: 6px; cursor: pointer;
+}
+.btn-submit:hover { background: #218838; }
+</style>
+
 </body>
 </html>

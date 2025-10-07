@@ -1,19 +1,5 @@
-
 <?php
 // Get user registrations (you'll need to adjust this query based on your database structure)
-$user_id = session()->get('user_id'); // Adjust based on your session management
-$user_registrations = []; // This should be populated from your database
-
-// Sample query structure - adjust to match your database:
-/*
-$user_registrations = $db->query("
-    SELECT event_id 
-    FROM event_registrations 
-    WHERE user_id = ?
-", [$user_id])->getResultArray();
-*/
-
-$registered_event_ids = array_column($user_registrations, 'event_id');
 ?>
 
 <!DOCTYPE html>
@@ -219,35 +205,86 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
       gap: 20px;
     }
 
-    .notification-bell {
-      position: relative;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: var(--dark-color);
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
+/* Notification Bell Button */
+.notification-bell {
+  position: relative;
+  background: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #4b5563; /* neutral gray */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
 
-    .notification-bell:hover {
-      color: var(--primary-color);
-    }
+.notification-bell:hover {
+  background: #f3f4f6;
+  color: #2563eb; /* your primary blue */
+  transform: scale(1.05);
+}
 
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: var(--danger-color);
-      color: white;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-    }
+/* Red Badge */
+.notification-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #ef4444; /* red */
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  animation: pulse 2s infinite;
+}
+
+/* Dropdown Panel */
+.notification-dropdown {
+  position: absolute;
+  top: 55px; /* below bell */
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  width: 300px;
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 9999;
+  padding: 10px 0;
+  display: none;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+/* Dropdown List */
+.notification-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-dropdown li {
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notification-dropdown li:hover {
+  background: #f9fafb;
+}
 
     .user-menu {
       position: relative;
@@ -876,10 +913,15 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
         </div>
       </div>
       <div class="topbar-actions">
-        <button class="notification-bell" id="notificationBell">
-          <i class='bx bx-bell'></i>
-          <span class="notification-badge">3</span>
-        </button>
+<button class="notification-bell" id="notificationBell">
+  <i class='bx bx-bell'></i>
+  <span class="notification-badge" id="notificationCount"></span>
+</button>
+
+<div id="notificationDropdown" class="notification-dropdown" style="display:none;">
+  <ul id="notificationList"></ul>
+</div>
+
         <div class="user-menu">
           <div class="user-avatar" id="userDropdown">
             <i class='bx bx-user'></i>
@@ -985,129 +1027,138 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
         </div>
     </div>
 
-    <div class="events-grid" id="eventsGrid">
-        <?php if (!empty($events)): ?>
-            <?php foreach ($events as $event): ?>
-                <?php
-                $is_registered = in_array($event['id'], $registered_event_ids);
-                $event_start = new DateTime($event['start_date']);
-                $event_end = new DateTime($event['end_date']);
-                $today = new DateTime();
-                $is_upcoming = $event_start > $today;
-                $is_ongoing = $today >= $event_start && $today <= $event_end;
-                
-                // Determine event category for filtering
-                $category = 'upcoming';
-                if ($is_registered) {
-                    $category = 'registered';
-                } elseif (!$is_upcoming && !$is_ongoing) {
-                    $category = 'past';
-                }
-                
-                // Skip past events unless registered
-                if (!$is_upcoming && !$is_ongoing && !$is_registered) {
-                    continue;
-                }
-                ?>
-                
-                <div class="event-card" data-category="<?= $category ?>" data-event-id="<?= $event['id'] ?>">
-                    <div class="event-image" style="background-image: url('<?= !empty($event['file']) ? base_url('uploads/events/' . $event['file']) : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&h=300&fit=crop' ?>');">
-                        <div class="event-date-badge">
-                            <?php if ($event['start_date'] === $event['end_date']): ?>
-                                <?= date('M d, Y', strtotime($event['start_date'])) ?>
-                            <?php else: ?>
-                                <?= date('M d', strtotime($event['start_date'])) ?> - <?= date('M d, Y', strtotime($event['end_date'])) ?>
-                            <?php endif; ?>
+<div class="events-grid" id="eventsGrid">
+    <?php if (!empty($events)): ?>
+        <?php foreach ($events as $event): ?>
+            <?php
+            $is_registered = in_array($event['id'], $registered_event_ids);
+            $event_start = new DateTime($event['start_date']);
+            $event_end = new DateTime($event['end_date']);
+            $today = new DateTime();
+            $is_upcoming = $event_start > $today;
+            $is_ongoing = $today >= $event_start && $today <= $event_end;
+
+            // ✅ Determine event category
+            $category = 'upcoming';
+            if ($is_registered) {
+                $category = 'registered'; // Mark as "My Events"
+            } elseif (!$is_upcoming && !$is_ongoing) {
+                $category = 'past';
+            }
+
+            // Skip past events unless registered
+            if (!$is_upcoming && !$is_ongoing && !$is_registered) {
+                continue;
+            }
+            ?>
+
+            <div class="event-card" 
+                 data-category="<?= $category ?>" 
+                 data-event-id="<?= $event['id'] ?>">
+                 
+                <!-- Event Image -->
+                <div class="event-image" style="background-image: url('<?= !empty($event['file']) 
+                    ? base_url('uploads/events/' . $event['file']) 
+                    : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&h=300&fit=crop' ?>');">
+                    
+                    <div class="event-date-badge">
+                        <?php if ($event['start_date'] === $event['end_date']): ?>
+                            <?= date('M d, Y', strtotime($event['start_date'])) ?>
+                        <?php else: ?>
+                            <?= date('M d', strtotime($event['start_date'])) ?> - <?= date('M d, Y', strtotime($event['end_date'])) ?>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if ($is_ongoing): ?>
+                        <div class="event-status-badge ongoing">
+                            <i class='bx bx-broadcast'></i>
+                            Live Now
                         </div>
-                        <?php if ($is_ongoing): ?>
-                            <div class="event-status-badge ongoing">
-                                <i class='bx bx-broadcast'></i>
-                                Live Now
-                            </div>
-                        <?php elseif (!$is_upcoming && !$is_ongoing): ?>
-                            <div class="event-status-badge completed">
-                                <i class='bx bx-check'></i>
-                                Completed
-                            </div>
+                    <?php elseif (!$is_upcoming && !$is_ongoing): ?>
+                        <div class="event-status-badge completed">
+                            <i class='bx bx-check'></i>
+                            Completed
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Event Details -->
+                <div class="event-details">
+                    <div class="event-title"><?= esc($event['event_name']) ?></div>
+                    <div class="event-description">
+                        <?= esc(substr($event['description'], 0, 150)) ?>
+                        <?= strlen($event['description']) > 150 ? '...' : '' ?>
+                    </div>
+                    
+                    <div class="event-meta">
+                        <span><i class='bx bx-map'></i> <?= esc($event['location']) ?></span>
+                        <?php if (isset($event['start_time'])): ?>
+                            <span><i class='bx bx-time'></i> <?= date('g:i A', strtotime($event['start_time'])) ?></span>
                         <?php endif; ?>
                     </div>
                     
-                    <div class="event-details">
-                        <div class="event-title"><?= esc($event['event_name']) ?></div>
-                        <div class="event-description">
-                            <?= esc(substr($event['description'], 0, 150)) ?><?= strlen($event['description']) > 150 ? '...' : '' ?>
-                        </div>
+                    <div class="event-actions">
+                        <!-- View Details -->
+                        <?php if (!empty($event['file'])): ?>
+                            <button class="btn btn-primary" onclick="viewEventDetails(<?= $event['id'] ?>, '<?= addslashes($event['event_name']) ?>')">
+                                <i class='bx bx-info-circle'></i>
+                                Read More
+                            </button>
+                        <?php else: ?>
+                            <button class="btn btn-primary" onclick="viewEventDetails(<?= $event['id'] ?>, '<?= addslashes($event['event_name']) ?>')">
+                                <i class='bx bx-info-circle'></i>
+                                View Details
+                            </button>
+                        <?php endif; ?>
                         
-                        <div class="event-meta">
-                            <span><i class='bx bx-map'></i> <?= esc($event['location']) ?></span>
-                            <?php if (isset($event['start_time'])): ?>
-                                <span><i class='bx bx-time'></i> <?= date('g:i A', strtotime($event['start_time'])) ?></span>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <div class="event-actions">
-                            <!-- View Details / Read More Button -->
-                            <?php if (!empty($event['file'])): ?>
-                                <button class="btn btn-primary" onclick="viewEventDetails(<?= $event['id'] ?>, '<?= addslashes($event['event_name']) ?>')">
-                                    <i class='bx bx-info-circle'></i>
-                                    Read More
+                        <!-- Registration Button -->
+                        <?php if ($is_registered): ?>
+                            <button class="btn btn-outline registered" disabled>
+                                <i class='bx bx-check'></i>
+                                Registered
+                            </button>
+                        <?php elseif ($is_upcoming || $is_ongoing): ?>
+                            <?php if (
+                                $event['audience'] === 'everyone' ||
+                                ($event['audience'] === 'students' && $current_user_role === 'student') ||
+                                ($event['audience'] === 'employees' && $current_user_role === 'employee')
+                            ): ?>
+                                <button type="button" 
+                                        class="btn btn-warning register-btn" 
+                                        data-event-id="<?= $event['id'] ?>" 
+                                        data-event-name="<?= esc($event['event_name']) ?>">
+                                    <i class='bx bx-user-plus'></i>
+                                    Join Now
                                 </button>
                             <?php else: ?>
-                                <button class="btn btn-primary" onclick="viewEventDetails(<?= $event['id'] ?>, '<?= addslashes($event['event_name']) ?>')">
-                                    <i class='bx bx-info-circle'></i>
-                                    View Details
+                                <button class="btn btn-secondary" disabled>
+                                    <i class='bx bx-lock'></i>
+                                    Restricted
                                 </button>
                             <?php endif; ?>
-                            
-                            <!-- Registration / Status Button -->
-                            <?php if ($is_registered): ?>
-                                <button class="btn btn-outline registered" disabled>
-                                    <i class='bx bx-check'></i>
-                                    Registered
-                                </button>
-<?php elseif ($is_upcoming || $is_ongoing): ?>
-    <?php if (
-        $event['audience'] === 'everyone' ||
-        ($event['audience'] === 'students' && $current_user_role === 'student') ||
-        ($event['audience'] === 'employees' && $current_user_role === 'employee')
-    ): ?>
-        <button type="button" 
-                class="btn btn-warning register-btn" 
-                data-event-id="<?= $event['id'] ?>" 
-                data-event-name="<?= esc($event['event_name']) ?>">
-            <i class='bx bx-user-plus'></i>
-            Join Now
-        </button>
-    <?php else: ?>
-        <button class="btn btn-secondary" disabled>
-            <i class='bx bx-lock'></i>
-            Restricted
-        </button>
-    <?php endif; ?>
-<?php endif; ?>
-
-                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="no-events-message">
-                <div class="empty-state">
-                    <i class='bx bx-calendar-x'></i>
-                    <h3>No Events Available</h3>
-                    <p>There are currently no events scheduled. Check back later for upcoming events and programs.</p>
-                </div>
             </div>
-        <?php endif; ?>
-    </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="no-events-message">
+            <div class="empty-state">
+                <i class='bx bx-calendar-x'></i>
+                <h3>No Events Available</h3>
+                <p>There are currently no events scheduled. Check back later for upcoming events and programs.</p>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
-        <div style="text-align: center; margin-top: 30px;">
-          <button class="btn btn-outline" id="loadMoreBtn">
-            <i class='bx bx-plus'></i>
-            Load More Events
-          </button>
-        </div>
+<div style="text-align: center; margin-top: 30px;">
+  <button class="btn btn-outline" id="loadMoreBtn">
+    <i class='bx bx-plus'></i>
+    Load More Events
+  </button>
+</div>
+
       </div>
     </div>
   </div>
@@ -1128,7 +1179,7 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
             <div class="col-md-4 text-center">
               <i class='bx bx-user-circle' style="font-size:80px;color:#0a3a5a;"></i>
               <p class="fw-bold mt-2 mb-0"><?= session('full_name') ?></p>
-              <small class="text-muted"><?= session('role') ?></small> <!-- ✅ User role -->
+              <small class="text-muted"><?= session('role') ?></small>
             </div>
             <div class="col-md-8">
               <div class="mb-2"><label class="form-label">First Name</label><input type="text" class="form-control" name="first_name" value="<?= session('first_name') ?>" required></div>
@@ -1157,8 +1208,6 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
       </div>
     </div>
   </div>
-
-
 
   <!-- Change Password Modal -->
   <div class="modal fade" id="passwordModal" tabindex="-1">
@@ -1221,8 +1270,7 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <!-- Hidden fields -->
-    <input type="hidden" name="event_id" id="eventIdInput">
+          <input type="hidden" name="event_id" id="eventIdInput">
     <input type="hidden" name="event_name" id="eventNameInput">
 
           <div class="mb-3">
@@ -1258,12 +1306,10 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
   </div>
 </div>
 
-
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // DOM Elements
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const menuToggle = document.getElementById('menuToggle');
@@ -1274,12 +1320,10 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
     const eventCards = document.querySelectorAll('.event-card');
     const successAlert = document.getElementById('successAlert');
 
-    // Mobile Check
     function isMobile() {
       return window.innerWidth <= 768;
     }
 
-    // Sidebar Toggle
     menuToggle.addEventListener('click', function() {
       if (isMobile()) {
         sidebar.classList.toggle('mobile-open');
@@ -1290,7 +1334,6 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
       }
     });
 
-    // Close mobile sidebar
     function closeMobileSidebar() {
       if (isMobile()) {
         sidebar.classList.remove('mobile-open');
@@ -1298,66 +1341,114 @@ $registered_event_ids = array_column($user_registrations, 'event_id');
       }
     }
 
-    // User Dropdown Toggle
     userDropdown.addEventListener('click', function(e) {
       e.stopPropagation();
       dropdownMenu.classList.toggle('show');
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
       if (!userDropdown.contains(e.target)) {
         dropdownMenu.classList.remove('show');
       }
     });
 
-    // Event filtering
+    // ✅ FIXED Event Filtering
+    function applyFilter(filter) {
+      const eventCards = document.querySelectorAll('.event-card');
+      
+      eventCards.forEach(card => {
+        const category = card.getAttribute('data-category');
+        
+        if (filter === 'all') {
+          card.style.display = 'block';
+        } else if (filter === 'registered') {
+          if (category === 'registered') {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        } else if (filter === 'upcoming') {
+          if (category === 'upcoming') {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      checkEmptyState(filter);
+    }
+
     filterTabs.forEach(tab => {
       tab.addEventListener('click', function() {
         filterTabs.forEach(t => t.classList.remove('active'));
         this.classList.add('active');
         const filter = this.getAttribute('data-filter');
-        eventCards.forEach(card => {
-          card.style.display = (filter === 'all' || card.getAttribute('data-category') === filter) ? 'block' : 'none';
-        });
+        applyFilter(filter);
       });
     });
 
-    // Event registration modal
-document.addEventListener('DOMContentLoaded', () => {
-    const registerButtons = document.querySelectorAll('.register-btn');
-    const eventIdInput = document.getElementById('eventIdInput');
-    const eventNameInput = document.getElementById('eventNameInput');
-    const eventNameDisplay = document.getElementById('eventNameDisplay');
-    const registerModalEl = document.getElementById('registerModal');
+    function checkEmptyState(filter) {
+      // Wait a bit for display changes to apply
+      setTimeout(() => {
+        const eventCards = document.querySelectorAll('.event-card');
+        const visibleCards = Array.from(eventCards).filter(card => {
+          const display = window.getComputedStyle(card).display;
+          return display !== 'none';
+        });
+        
+        const eventsGrid = document.getElementById('eventsGrid');
+        const existingMessage = eventsGrid.querySelector('.filter-empty-state');
+        
+        if (existingMessage) {
+          existingMessage.remove();
+        }
+        
+        if (visibleCards.length === 0) {
+          let message = '';
+          if (filter === 'registered') {
+            message = '<div class="filter-empty-state" style="text-align:center;padding:60px 20px;grid-column:1/-1;"><i class="bx bx-calendar-x" style="font-size:80px;color:#cbd5e1;"></i><h3 style="color:#64748b;margin-top:20px;">No Registered Events</h3><p style="color:#94a3b8;">You haven\'t registered for any events yet. Browse upcoming events and join now!</p></div>';
+          } else if (filter === 'upcoming') {
+            message = '<div class="filter-empty-state" style="text-align:center;padding:60px 20px;grid-column:1/-1;"><i class="bx bx-calendar" style="font-size:80px;color:#cbd5e1;"></i><h3 style="color:#64748b;margin-top:20px;">No Upcoming Events</h3><p style="color:#94a3b8;">There are no upcoming events at the moment. Check back later!</p></div>';
+          }
+          if (message) {
+            eventsGrid.insertAdjacentHTML('beforeend', message);
+          }
+        }
+      }, 50);
+    }
 
-    if (!registerButtons.length || !registerModalEl) return;
+    document.addEventListener('DOMContentLoaded', () => {
+        const registerButtons = document.querySelectorAll('.register-btn');
+        const eventIdInput = document.getElementById('eventIdInput');
+        const eventNameInput = document.getElementById('eventNameInput');
+        const eventNameDisplay = document.getElementById('eventNameDisplay');
+        const registerModalEl = document.getElementById('registerModal');
 
-    const registerModal = new bootstrap.Modal(registerModalEl);
+        if (!registerButtons.length || !registerModalEl) return;
 
-    registerButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const eventId = button.dataset.eventId || '';
-            const eventName = button.dataset.eventName || '';
+        const registerModal = new bootstrap.Modal(registerModalEl);
 
-            // ✅ Fill hidden form fields
-            if (eventIdInput) eventIdInput.value = eventId;
-            if (eventNameInput) eventNameInput.value = eventName;
-            if (eventNameDisplay) eventNameDisplay.value = eventName;
+        registerButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const eventId = button.dataset.eventId || '';
+                const eventName = button.dataset.eventName || '';
 
-            // ✅ Show modal
-            registerModal.show();
+                if (eventIdInput) eventIdInput.value = eventId;
+                if (eventNameInput) eventNameInput.value = eventName;
+                if (eventNameDisplay) eventNameDisplay.value = eventName;
+
+                registerModal.show();
+            });
         });
     });
-});
 
+    function viewEventDetails(eventName) {
+        alert(`Viewing details for: ${eventName}`);
+    }
 
-// Optional function if you have a "View Details" button
-function viewEventDetails(eventName) {
-    alert(`Viewing details for: ${eventName}`);
-}
-
-    // Password toggle
     function togglePassword(inputId, icon) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
@@ -1369,7 +1460,6 @@ function viewEventDetails(eventName) {
       }
     }
 
-    // Load more events
     document.getElementById('loadMoreBtn').addEventListener('click', function() {
       const btn = this;
       const originalContent = btn.innerHTML;
@@ -1382,7 +1472,6 @@ function viewEventDetails(eventName) {
       }, 2000);
     });
 
-    // Show success alert
     function showSuccessAlert(message) {
       document.getElementById('alertMessage').textContent = message;
       successAlert.style.display = 'block';
@@ -1391,24 +1480,49 @@ function viewEventDetails(eventName) {
       }, 5000);
     }
 
-    // Close alert
     function closeAlert() {
       successAlert.style.display = 'none';
     }
 
-    // Notification bell
-    document.getElementById('notificationBell').addEventListener('click', function() {
-      alert('Notifications:\n\n• New event: Community Health Fair\n• Appointment reminder: Tomorrow at 10:00 AM\n• Registration confirmed: Business Seminar');
+    document.getElementById('notificationBell').addEventListener('click', function () {
+      let dropdown = document.getElementById('notificationDropdown');
+      dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
     });
 
-    // Window resize handler
+    function loadNotifications() {
+      fetch('/user/notifications/fetch')
+        .then(response => response.json())
+        .then(data => {
+          let list = document.getElementById('notificationList');
+          let count = document.getElementById('notificationCount');
+          list.innerHTML = '';
+
+          if (!data || data.length === 0) {
+            list.innerHTML = '<li>No new notifications</li>';
+            count.style.display = 'none';
+          } else {
+            data.forEach(n => {
+              let li = document.createElement('li');
+              li.textContent = n.message;
+              list.appendChild(li);
+            });
+            let unreadCount = data.filter(n => n.is_read == 0).length;
+            count.textContent = unreadCount;
+            count.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+          }
+        })
+        .catch(err => console.error('Notification fetch failed:', err));
+    }
+
+    setInterval(loadNotifications, 30000);
+    loadNotifications();
+
     window.addEventListener('resize', function() {
       if (!isMobile() && sidebar.classList.contains('mobile-open')) {
         closeMobileSidebar();
       }
     });
 
-    // Navigation link animations
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function() {
         const icon = this.querySelector('i');
@@ -1420,7 +1534,6 @@ function viewEventDetails(eventName) {
       });
     });
 
-    // Initialize animations on scroll
     function initializeScrollAnimations() {
       const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
       const observer = new IntersectionObserver(function(entries) {
@@ -1440,12 +1553,9 @@ function viewEventDetails(eventName) {
       });
     }
 
-    // -------------------------------
-    // 🕒 Idle Timeout with Warning
-    // -------------------------------
     let logoutTimer, warningTimer;
-    const LOGOUT_TIME = 10 * 60 * 1000; // 10 minutes
-    const WARNING_TIME = 9 * 60 * 1000; // Show warning at 9 minutes
+    const LOGOUT_TIME = 10 * 60 * 1000;
+    const WARNING_TIME = 9 * 60 * 1000;
 
     function redirectToLogin() {
       window.location.href = "<?= base_url('/login') ?>";
@@ -1484,7 +1594,6 @@ function viewEventDetails(eventName) {
     document.onscroll = resetTimer;
     document.onclick = resetTimer;
 
-    // Initialize on load
     window.addEventListener('load', function() {
       initializeScrollAnimations();
       setTimeout(() => {
@@ -1492,7 +1601,6 @@ function viewEventDetails(eventName) {
       }, 1000);
     });
 
-    // Add mobile overlay styles
     const style = document.createElement('style');
     style.textContent = `
       .mobile-overlay {
@@ -1502,7 +1610,7 @@ function viewEventDetails(eventName) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0,0,0,0.5);
         z-index: 999;
       }
       @media (max-width: 768px) {

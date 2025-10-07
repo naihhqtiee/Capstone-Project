@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_green.css">
 
   <style>
     :root {
@@ -35,7 +38,6 @@
       overflow-x: hidden;
     }
 
-    /* Sidebar Styles */
     .sidebar {
       position: fixed;
       left: 0;
@@ -150,7 +152,6 @@
       display: none;
     }
 
-    /* Main Content */
     .main-content {
       margin-left: var(--sidebar-width);
       min-height: 100vh;
@@ -161,7 +162,6 @@
       margin-left: 70px;
     }
 
-    /* Top Bar */
     .topbar {
       height: var(--topbar-height);
       background: rgba(255,255,255,0.95);
@@ -195,12 +195,10 @@
       gap: 10px;
     }
 
-    /* Content Area */
     .content-area {
       padding: 30px;
     }
 
-    /* Appointment Form Container */
     .appointment-form-container {
       background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
       backdrop-filter: blur(15px);
@@ -245,7 +243,6 @@
       border-radius: 2px;
     }
 
-    /* Enhanced Form Styles */
     .form-label {
       font-weight: 600;
       color: var(--dark-color);
@@ -282,7 +279,6 @@
       transform: translateY(-1px);
     }
 
-    /* Input Group Enhancement */
     .input-group-enhanced {
       position: relative;
       margin-bottom: 25px;
@@ -302,7 +298,6 @@
       z-index: 5;
     }
 
-    /* Button Styles */
     .btn {
       padding: 12px 30px;
       border-radius: 12px;
@@ -357,7 +352,11 @@
       box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
     }
 
-    /* Alert Styles */
+    #date {
+      background-color: #fff;
+      cursor: pointer;
+    }
+
     .alert {
       border: none;
       border-radius: 15px;
@@ -380,7 +379,12 @@
       border-left: 4px solid var(--danger-color);
     }
 
-    /* Progress Indicator */
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #92400e;
+      border-left: 4px solid var(--warning-color);
+    }
+
     .form-progress {
       position: relative;
       height: 6px;
@@ -398,30 +402,17 @@
       width: 0%;
     }
 
-    /* Character Counter */
     .char-counter {
       font-size: 0.85rem;
       margin-top: 5px;
       font-weight: 500;
     }
 
-    .char-counter.danger {
-      color: var(--danger-color);
-    }
+    .char-counter.danger { color: var(--danger-color); }
+    .char-counter.warning { color: var(--warning-color); }
+    .char-counter.success { color: var(--success-color); }
+    .char-counter.muted { color: #64748b; }
 
-    .char-counter.warning {
-      color: var(--warning-color);
-    }
-
-    .char-counter.success {
-      color: var(--success-color);
-    }
-
-    .char-counter.muted {
-      color: #64748b;
-    }
-
-    /* Loading State */
     .btn-loading {
       pointer-events: none;
       opacity: 0.7;
@@ -441,40 +432,14 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Validation Styles */
     .form-control.is-valid {
       border-color: var(--success-color);
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='m2.3 6.73.94-.94 2.94-2.94.94.94L2.94 7.93z'/%3e%3c/svg%3e");
     }
 
     .form-control.is-invalid {
       border-color: var(--danger-color);
     }
 
-    /* Status indicators for time slots */
-    .time-status {
-      font-size: 0.75rem;
-      margin-top: 5px;
-      color: #64748b;
-    }
-
-    .slots-loading {
-      text-align: center;
-      color: #64748b;
-      padding: 20px;
-      font-style: italic;
-    }
-
-    .no-slots {
-      text-align: center;
-      color: var(--danger-color);
-      padding: 20px;
-      background: rgba(239, 68, 68, 0.1);
-      border-radius: 8px;
-      border-left: 4px solid var(--danger-color);
-    }
-
-    /* Mobile Responsive */
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
@@ -531,7 +496,6 @@
       }
     }
 
-    /* Animations */
     .fade-in {
       animation: fadeIn 0.6s ease-out;
     }
@@ -552,7 +516,6 @@
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <img src="/images/logochre.jpg" alt="Logo" class="logo">
@@ -608,323 +571,313 @@
       </div>
     </div>
 
-<div class="content-area">
-  <div class="appointment-form-container fade-in">
-    <h3><i class='bx bx-calendar-heart'></i> SET AN APPOINTMENT</h3>
-    
-    <!-- Form Progress -->
-    <div class="form-progress">
-      <div class="form-progress-bar" id="progressBar"></div>
+    <div class="content-area">
+      <div class="appointment-form-container fade-in">
+        <h3><i class='bx bx-calendar-heart'></i> SET AN APPOINTMENT</h3>
+        
+        <div class="form-progress">
+          <div class="form-progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <form method="post" id="appointmentForm" action="<?= base_url('appointment/set') ?>" class="slide-up">
+          <?= csrf_field() ?>
+
+          <div class="input-group-enhanced">
+            <label for="fullname" class="form-label"><i class='bx bx-user'></i> Full Name *</label>
+            <div style="position: relative;">
+              <i class='bx bx-user input-icon'></i>
+              <input type="text" class="form-control" id="fullname" name="fullname" 
+                     value="<?= old('fullname') ?: session('full_name') ?>"
+                     placeholder="Enter your full name" required>
+            </div>
+          </div>
+
+          <div class="input-group-enhanced">
+            <label for="email" class="form-label"><i class='bx bx-envelope'></i> Email Address *</label>
+            <div style="position: relative;">
+              <i class='bx bx-envelope input-icon'></i>
+              <input type="email" class="form-control" id="email" name="email" 
+                     value="<?= old('email') ?: session('email') ?>"
+                     placeholder="Enter your email address" required>
+            </div>
+          </div>
+
+          <div class="input-group-enhanced">
+            <label for="contactnumber" class="form-label"><i class='bx bx-phone'></i> Contact Number *</label>
+            <div style="position: relative;">
+              <i class='bx bx-phone input-icon'></i>
+              <input type="tel" class="form-control" id="contactnumber" name="contactnumber" 
+                     value="<?= old('contactnumber') ?: session('contact_number') ?>"
+                     placeholder="Enter your contact number" required
+                     pattern="[0-9]{11}" title="Please enter a valid 11-digit phone number">
+            </div>
+            <small class="text-muted">Format: 11 digits number (e.g., 09123456789)</small>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-7 mb-3">
+              <label for="date" class="form-label"><i class='bx bx-calendar'></i> Date of Appointment *</label>
+              <div style="position: relative;">
+                <i class='bx bx-calendar input-icon'></i>
+                <input type="text" class="form-control" id="date" name="date" placeholder="Click to select date" required readonly>
+              </div>
+              <small class="text-muted">Click to select from available dates (Mon-Fri)</small>
+            </div>
+
+            <div class="col-md-5 mb-3">
+              <label for="time" class="form-label"><i class='bx bx-time'></i> Preferred Time *</label>
+              <div style="position: relative;">
+                <i class='bx bx-time input-icon'></i>
+                <select class="form-control" id="time" name="time" required>
+                  <option value="">Select Date First</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group-enhanced">
+            <label for="purpose" class="form-label"><i class='bx bx-edit'></i> Purpose of Appointment *</label>
+            <textarea class="form-control" id="purpose" name="purpose" rows="4"
+                      placeholder="Please describe the purpose of your appointment in detail..."
+                      maxlength="500" required><?= old('purpose') ?></textarea>
+            <div class="char-counter muted" id="charCounter">0/500 characters</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+              <i class='bx bx-arrow-back'></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <i class='bx bx-calendar-check'></i> Set Appointment
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-
-    <!-- Alerts -->
-    <div id="alertContainer"></div>
-
-    <!-- Appointment Form -->
-    <form method="post" id="appointmentForm" action="<?= base_url('appointment/set') ?>" class="slide-up">
-      <?= csrf_field() ?>
-
-      <!-- Full Name -->
-      <div class="input-group-enhanced">
-        <label for="fullname" class="form-label"><i class='bx bx-user'></i> Full Name *</label>
-        <div style="position: relative;">
-          <i class='bx bx-user input-icon'></i>
-          <input type="text" class="form-control" id="fullname" name="fullname" 
-                 value="<?= old('fullname') ?: session('full_name') ?>"
-                 placeholder="Enter your full name" required>
-        </div>
-      </div>
-
-      <!-- Email -->
-      <div class="input-group-enhanced">
-        <label for="email" class="form-label"><i class='bx bx-envelope'></i> Email Address *</label>
-        <div style="position: relative;">
-          <i class='bx bx-envelope input-icon'></i>
-          <input type="email" class="form-control" id="email" name="email" 
-                 value="<?= old('email') ?: session('email') ?>"
-                 placeholder="Enter your email address" required>
-        </div>
-      </div>
-
-      <!-- Date & Time -->
-      <div class="row mb-4">
-        <div class="col-md-7 mb-3">
-          <label for="date" class="form-label"><i class='bx bx-calendar'></i> Date of Appointment *</label>
-          <div style="position: relative;">
-            <i class='bx bx-calendar input-icon'></i>
-            <input type="date" class="form-control" id="date" name="date" required min="<?= date('Y-m-d') ?>">
-          </div>
-          <small class="text-muted">Weekdays only (Monday-Friday)</small>
-        </div>
-
-        <div class="col-md-5 mb-3">
-          <label for="time" class="form-label"><i class='bx bx-time'></i> Preferred Time *</label>
-          <div style="position: relative;">
-            <i class='bx bx-time input-icon'></i>
-            <select class="form-control" id="time" name="time" required>
-              <option value="">Select Time</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Purpose -->
-      <div class="input-group-enhanced">
-        <label for="purpose" class="form-label"><i class='bx bx-edit'></i> Purpose of Appointment *</label>
-        <textarea class="form-control" id="purpose" name="purpose" rows="4"
-                  placeholder="Please describe the purpose of your appointment in detail..."
-                  maxlength="500" required><?= old('purpose') ?></textarea>
-        <div class="char-counter muted" id="charCounter">0/500 characters</div>
-      </div>
-
-      <!-- Actions -->
-      <div class="d-flex justify-content-between align-items-center mt-4">
-        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
-          <i class='bx bx-arrow-back'></i> Back
-        </button>
-        <button type="submit" class="btn btn-primary" id="submitBtn">
-          <i class='bx bx-calendar-check'></i> Set Appointment
-        </button>
-      </div>
-    </form>
   </div>
-</div>
 
-  <!-- Mobile Overlay -->
-  <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()" 
+       style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <script>
-    // DOM Elements
-    const sidebar = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-const menuToggle = document.getElementById('menuToggle');
-const mobileOverlay = document.getElementById('mobileOverlay');
-const dateInput = document.getElementById('date');
-const timeDropdown = document.getElementById('time');
-const purposeField = document.getElementById('purpose');
-const charCounter = document.getElementById('charCounter');
-const form = document.getElementById('appointmentForm');
-const submitBtn = document.getElementById('submitBtn');
-const progressBar = document.getElementById('progressBar');
+    let availableDates = [];
+    let flatpickrInstance = null;
 
-// Utility functions
-function isMobile() {
-  return window.innerWidth <= 768;
-}
-
-function setMinDate() {
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  dateInput.min = `${yyyy}-${mm}-${dd}`;
-}
-
-function formatTime(time24) {
-  const [hours, minutes] = time24.split(':');
-  const hour = parseInt(hours);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-  return `${displayHour}:${minutes} ${ampm}`;
-}
-
-// Fetch available slots from backend
-function fetchAvailableSlots(selectedDate) {
-  console.log('=== STARTING FETCH ===');
-  console.log('Fetching slots for date:', selectedDate);
   
-  timeDropdown.innerHTML = '<option value="">Loading slots...</option>';
-  timeDropdown.disabled = true;
+    function fetchAvailableDates() {
+      console.log('🔄 Fetching available dates...');
+      fetch("<?= base_url('appointment/getAvailableDates') ?>")
+        .then(res => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        })
+        .then(data => {
+          console.log("📅 Raw data from server:", data);
+          
+          // Ensure we have an array of date strings
+          if (Array.isArray(data)) {
+            availableDates = data.map(date => {
+              // Ensure consistent YYYY-MM-DD format
+              if (typeof date === 'string') {
+                return date.split('T')[0]; // Remove time if present
+              }
+              return date;
+            });
+          } else if (data.available && Array.isArray(data.available)) {
+            availableDates = data.available.map(date => {
+              if (typeof date === 'string') {
+                return date.split('T')[0];
+              }
+              return date;
+            });
+          } else {
+            console.error("Unexpected data format:", data);
+            availableDates = [];
+          }
 
-  // Build URL step by step for debugging
-  const baseUrl = window.location.origin;
-  const url = `${baseUrl}/appointment/getAvailableSlots/${selectedDate}`;
-  console.log('Full URL:', url);
-  console.log('Base URL:', baseUrl);
+          console.log("✅ Available Dates Loaded:", availableDates);
 
-  fetch(url, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-cache'
-  })
-    .then(response => {
-      console.log('=== RESPONSE RECEIVED ===');
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      console.log('Response headers:', [...response.headers.entries()]);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      return response.text(); // Get as text first to see raw response
-    })
-    .then(text => {
-      console.log('=== RAW RESPONSE TEXT ===');
-      console.log('Raw response length:', text.length);
-      console.log('Raw response:', text);
-      
-      let data;
-      try {
-        data = JSON.parse(text);
-        console.log('=== PARSED JSON ===');
-        console.log('Parsed data:', data);
-      } catch (parseError) {
-        console.error('=== JSON PARSE ERROR ===');
-        console.error('Parse error:', parseError);
-        console.error('Trying to parse:', text.substring(0, 500));
-        
-        timeDropdown.innerHTML = '<option value="" disabled>Server response error</option>';
-        timeDropdown.disabled = false;
-        showAlert('Server returned invalid response. Check console for details.', 'danger');
-        return;
-      }
-      
-      // Now process the data
-      timeDropdown.innerHTML = '';
-      timeDropdown.disabled = false;
+          if (availableDates.length === 0) {
+            showAlert('No available dates found. Please contact the administrator.', 'warning');
+          } else {
+            showAlert(`${availableDates.length} dates available for booking.`, 'success');
+          }
 
-      if (data.error) {
-        console.log('=== SERVER ERROR ===');
-        console.log('Error message:', data.error);
-        timeDropdown.innerHTML = `<option value="" disabled>${data.error}</option>`;
-        showAlert(data.error, 'danger');
-        return;
+          initializeDatePicker();
+        })
+        .catch(err => {
+          console.error("❌ Error fetching available dates:", err);
+          showAlert('Failed to load available dates. Please refresh the page.', 'danger');
+        });
+    }
+
+    function initializeDatePicker() {
+      if (flatpickrInstance) {
+        flatpickrInstance.destroy();
       }
 
-      if (!data.available || data.available.length === 0) {
-        console.log('=== NO SLOTS AVAILABLE ===');
-        timeDropdown.innerHTML = '<option value="" disabled>No available slots</option>';
-        showAlert('No time slots available for this date. Please try another date.', 'warning');
-        return;
-      }
-
-      console.log('=== ADDING SLOTS ===');
-      console.log('Number of slots:', data.available.length);
-      console.log('Slots array:', data.available);
-
-      // Add default option
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Select a time slot';
-      timeDropdown.appendChild(defaultOption);
-
-      // Add available slots
-      data.available.forEach((slot, index) => {
-        console.log(`Adding slot ${index + 1}:`, slot);
-        const option = document.createElement('option');
-        option.value = slot;
-        option.textContent = formatTime(slot);
-        timeDropdown.appendChild(option);
+      flatpickrInstance = flatpickr("#date", {
+        dateFormat: "Y-m-d",
+        enable: availableDates.length > 0 ? availableDates : [],
+        minDate: "today",
+        disableMobile: true,
+        clickOpens: true,
+        allowInput: false,
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+          const date = dayElem.dateObj.toISOString().split('T')[0];
+          if (availableDates.includes(date)) {
+            dayElem.style.backgroundColor = "#4CAF50";
+            dayElem.style.color = "white";
+            dayElem.style.fontWeight = "bold";
+            dayElem.title = "Available for booking";
+          }
+        },
+        onChange: function(selectedDates, dateStr) {
+          if (dateStr) {
+            console.log("📆 Date selected:", dateStr);
+            fetchAvailableSlots(dateStr);
+            dateInput.classList.add('is-valid');
+            dateInput.classList.remove('is-invalid');
+          }
+        },
+        onOpen: function() {
+          console.log("📅 Calendar opened. Available dates:", availableDates);
+        }
       });
 
-      console.log('=== SLOTS ADDED SUCCESSFULLY ===');
-      console.log('Final dropdown options count:', timeDropdown.options.length);
-      showAlert(`${data.available.length} time slots loaded successfully!`, 'success');
-    })
-    .catch(error => {
-      console.error('=== FETCH ERROR ===');
-      console.error('Error type:', error.constructor.name);
-      console.error('Error message:', error.message);
-      console.error('Full error:', error);
-      
-      timeDropdown.innerHTML = '<option value="" disabled>Connection failed</option>';
-      timeDropdown.disabled = false;
-      
-      showAlert('Failed to connect to server. Check your internet connection.', 'danger');
-    });
-}
-
-// Validate selected date
-function validateDate(dateValue) {
-  const selectedDate = new Date(dateValue);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // Check if date is in the past
-  if (selectedDate < today) {
-    showAlert('Cannot select past dates. Please choose today or a future date.', 'danger');
-    dateInput.value = '';
-    return false;
-  }
-
-  // Check if it's a weekend
-  const dayOfWeek = selectedDate.getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    showAlert('Appointments are only available on weekdays (Monday-Friday).', 'danger');
-    dateInput.value = '';
-    return false;
-  }
-
-  return true;
-}
-
-// Real-time character counter for purpose field
-function updateCharacterCount() {
-  const currentLength = purposeField.value.length;
-  const maxLength = 500;
-  const remaining = maxLength - currentLength;
-
-  charCounter.textContent = `${currentLength}/${maxLength} characters`;
-  
-  if (remaining < 50) {
-    charCounter.className = 'char-counter danger';
-  } else if (remaining < 100) {
-    charCounter.className = 'char-counter warning';
-  } else if (currentLength > 0) {
-    charCounter.className = 'char-counter success';
-  } else {
-    charCounter.className = 'char-counter muted';
-  }
-}
-
-// Form validation
-function validateForm() {
-  let isValid = true;
-  const requiredFields = ['fullname', 'email', 'date', 'time', 'purpose'];
-
-  requiredFields.forEach(fieldName => {
-    const field = document.getElementById(fieldName);
-    if (!field.value.trim()) {
-      field.classList.add('is-invalid');
-      isValid = false;
-    } else {
-      field.classList.remove('is-invalid');
-      field.classList.add('is-valid');
+      console.log("🔧 Flatpickr initialized with", availableDates.length, "available dates");
     }
-  });
 
-  // Email validation
-  const emailField = document.getElementById('email');
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (emailField.value && !emailRegex.test(emailField.value)) {
-    emailField.classList.add('is-invalid');
-    showAlert('Please enter a valid email address.', 'danger');
-    isValid = false;
-  }
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const dateInput = document.getElementById('date');
+    const timeDropdown = document.getElementById('time');
+    const purposeField = document.getElementById('purpose');
+    const charCounter = document.getElementById('charCounter');
+    const form = document.getElementById('appointmentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressBar = document.getElementById('progressBar');
 
-  // Purpose validation
-  const purposeValue = purposeField.value.trim();
-  if (purposeValue.length < 10) {
-    purposeField.classList.add('is-invalid');
-    showAlert('Purpose must be at least 10 characters long.', 'danger');
-    isValid = false;
-  }
+    function isMobile() {
+      return window.innerWidth <= 768;
+    }
 
-  // Time slot validation
-  if (!timeDropdown.value) {
-    timeDropdown.classList.add('is-invalid');
-    showAlert('Please select an available time slot.', 'danger');
-    isValid = false;
-  }
+    function formatTime(time24) {
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+      return `${displayHour}:${minutes} ${ampm}`;
+    }
 
-  return isValid;
-}
+    function fetchAvailableSlots(selectedDate) {
+      console.log('🔍 Fetching slots for date:', selectedDate);
+      
+      timeDropdown.innerHTML = '<option value="">Loading slots...</option>';
+      timeDropdown.disabled = true;
+
+      const url = "<?= base_url('appointment/getAvailableSlots') ?>/" + selectedDate;
+      console.log('📡 Full URL:', url);
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          console.log('📊 Slots data:', data);
+
+          timeDropdown.innerHTML = '';
+          timeDropdown.disabled = false;
+
+          if (!data.available || data.available.length === 0) {
+            timeDropdown.innerHTML = '<option value="" disabled>No available slots</option>';
+            showAlert(data.message || 'No time slots available for this date.', 'warning');
+            return;
+          }
+
+          const defaultOption = document.createElement('option');
+          defaultOption.value = '';
+          defaultOption.textContent = 'Select a time slot';
+          timeDropdown.appendChild(defaultOption);
+
+          data.available.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot;
+            option.textContent = formatTime(slot);
+            timeDropdown.appendChild(option);
+          });
+
+          showAlert(`${data.available.length} time slots loaded successfully!`, 'success');
+        })
+        .catch(err => {
+          console.error('❌ Error fetching slots:', err);
+          timeDropdown.innerHTML = '<option value="" disabled>Error loading slots</option>';
+          timeDropdown.disabled = false;
+          showAlert('Failed to fetch available slots.', 'danger');
+        });
+    }
+
+    function updateCharacterCount() {
+      const currentLength = purposeField.value.length;
+      const maxLength = 500;
+      const remaining = maxLength - currentLength;
+
+      charCounter.textContent = `${currentLength}/${maxLength} characters`;
+      
+      if (remaining < 50) {
+        charCounter.className = 'char-counter danger';
+      } else if (remaining < 100) {
+        charCounter.className = 'char-counter warning';
+      } else if (currentLength > 0) {
+        charCounter.className = 'char-counter success';
+      } else {
+        charCounter.className = 'char-counter muted';
+      }
+    }
+
+    function validateForm() {
+      let isValid = true;
+      const requiredFields = ['fullname', 'email', 'contactnumber', 'date', 'time', 'purpose'];
+
+      requiredFields.forEach(fieldName => {
+        const field = document.getElementById(fieldName);
+        if (!field.value.trim()) {
+          field.classList.add('is-invalid');
+          isValid = false;
+        } else {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+      });
+
+      const emailField = document.getElementById('email');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailField.value && !emailRegex.test(emailField.value)) {
+        emailField.classList.add('is-invalid');
+        showAlert('Please enter a valid email address.', 'danger');
+        isValid = false;
+      }
+
+      const purposeValue = purposeField.value.trim();
+      if (purposeValue.length < 10) {
+        purposeField.classList.add('is-invalid');
+        showAlert('Purpose must be at least 10 characters long.', 'danger');
+        isValid = false;
+      }
+
+      if (!timeDropdown.value) {
+        timeDropdown.classList.add('is-invalid');
+        showAlert('Please select an available time slot.', 'danger');
+        isValid = false;
+      }
+
+      return isValid;
+    }
 
 // Update progress bar
 function updateProgress() {
@@ -1063,21 +1016,17 @@ window.addEventListener('resize', function() {
   }
 });
 
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-  setMinDate();
-  updateProgress();
-  updateCharacterCount();
-  
-  console.log('Page initialized');
-});
-
 // Debug function - you can remove this later
 function testSlotFetch() {
   const testDate = '2024-12-20'; // Use a future date
   console.log('Testing slot fetch for:', testDate);
   fetchAvailableSlots(testDate);
 }
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAvailableDates();
+});
+
+
   </script>
 
 </body>

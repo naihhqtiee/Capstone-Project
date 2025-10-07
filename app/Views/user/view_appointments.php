@@ -1142,39 +1142,45 @@ if (!empty($appointments)) {
             <td><?= date('h:i A', strtotime($apt['appointment_time'])) ?></td>
             <td><span class="status-badge status-<?= strtolower($apt['status']) ?>"><?= esc($apt['status']) ?></span></td>
             <td><?= esc($apt['purpose']) ?></td>
-            <td>
-              <div class="action-buttons">
-                <?php if ($apt['status'] === 'Pending'): ?>
-                  <button class="btn btn-warning btn-sm">
-                    <i class='bx bx-edit'></i>
-                    Reschedule
-                  </button>
-                  <button class="btn btn-danger btn-sm">
-                    <i class='bx bx-x'></i>
-                    Cancel
-                  </button>
-                <?php elseif ($apt['status'] === 'Approved'): ?>
-                  <button class="btn btn-danger btn-sm">
-                    <i class='bx bx-x'></i>
-                    Cancel
-                  </button>
-                <?php elseif ($apt['status'] === 'Completed'): ?>
-                  <button class="btn btn-info btn-sm">
-                    <i class='bx bx-info-circle'></i>
-                    View Details
-                  </button>
-                  <button class="btn btn-success btn-sm">
-                    <i class='bx bx-download'></i>
-                    Download
-                  </button>
-                <?php else: ?>
-                  <button class="btn btn-info btn-sm">
-                    <i class='bx bx-info-circle'></i>
-                    View Details
-                  </button>
-                <?php endif; ?>
-              </div>
-            </td>
+<td>
+  <div class="action-buttons">
+    <?php if ($apt['status'] === 'Pending'): ?>
+      <a href="<?= site_url('appointment/reschedule/' . $apt['id']) ?>" 
+         class="btn btn-warning btn-sm">
+        <i class='bx bx-edit'></i> Reschedule
+      </a>
+      <a href="<?= site_url('appointment/cancel/' . $apt['id']) ?>" 
+         class="btn btn-danger btn-sm"
+         onclick="return confirm('Are you sure you want to cancel this appointment?');">
+        <i class='bx bx-x'></i> Cancel
+      </a>
+
+    <?php elseif ($apt['status'] === 'Approved'): ?>
+      <a href="<?= site_url('appointment/cancel/' . $apt['id']) ?>" 
+         class="btn btn-danger btn-sm"
+         onclick="return confirm('Are you sure you want to cancel this appointment?');">
+        <i class='bx bx-x'></i> Cancel
+      </a>
+
+    <?php elseif ($apt['status'] === 'Completed'): ?>
+      <a href="<?= site_url('appointment/view/' . $apt['id']) ?>" 
+         class="btn btn-info btn-sm">
+        <i class='bx bx-info-circle'></i> View Details
+      </a>
+      <a href="<?= site_url('appointment/download/' . $apt['id']) ?>" 
+         class="btn btn-success btn-sm">
+        <i class='bx bx-download'></i> Download
+      </a>
+
+    <?php else: ?>
+      <a href="<?= site_url('appointment/view/' . $apt['id']) ?>" 
+         class="btn btn-info btn-sm">
+        <i class='bx bx-info-circle'></i> View Details
+      </a>
+    <?php endif; ?>
+  </div>
+</td>
+
           </tr>
         <?php endforeach; ?>
       <?php else: ?>

@@ -8,7 +8,8 @@ class AccountModel extends Model
     protected $table = 'accounts';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'full_name', 'email', 'password', 'role', 'token', 'status', 'created_at', 'updated_at'
+        'full_name', 'email', 'password', 'role', 'token', 'status', 'created_at', 'updated_at', 'reset_token'
     ];
     protected $useTimestamps = true;
 }
+

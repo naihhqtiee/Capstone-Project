@@ -799,13 +799,6 @@
       </div>
 
       <!-- User Profile -->
-      <div class="user-profile">
-        <div class="user-avatar">
-          <i class='bx bx-user'></i>
-        </div>
-        <div class="user-name"><?= esc(session()->get('full_name')) ?> </div>
-        <div class="user-role"><?= esc(session()->get('role')) ?></div>
-      </div>
 
       <!-- Navigation -->
       <div class="nav-section">
